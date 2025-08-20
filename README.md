@@ -14,14 +14,15 @@ It uses **NestJS** for the backend, **NextJS** for the frontend, and **Elasticse
 This is a early stage of the project, so there are still bugs and issues. 
 
 
+
 ---
 
 
 ## ✅ Current Features
 
-- 🔔 **Discord Alerters**  
-- 💬 **Slack Alerters**  
-- 📧 **Email Alerters**  
+- 🔔 **Discord Alerters**  ([Discord Bot](https://discord.com/developers/docs/quick-start/overview-of-apps)) 
+- 💬 **Slack Alerters**  ([Slack App](https://api.slack.com/apps))
+- 📧 **Email Alerters**  (SMTP)
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
 
@@ -54,7 +55,7 @@ curl -fsSL https://elastic.co/start-local | sh
 KIBANA_URL="http://host.docker.internal:5601" # URL for Kibana instance
 ELASTIC_URL="http://host.docker.internal:9200" # Elasticsearch node URL
 ELASTIC_API_KEY='API-KEY-HERE' # Replace with your actual API key
-KIBALERT_INDEX_PREFIX="kibalert" # Prefix for Kibalert indices allow multiple instances
+KIBALERT_INDEX_PREFIX="kiba" # Prefix for Kib.A indices allow multiple instances
 POLL_EVERY=10 # Time in seconds to poll Elasticsearch for new alerts
 ENCRYPTION_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=" # Encryption key for sensitive data ( openssl  rand -base64 32 )
 ```
@@ -66,7 +67,6 @@ ENCRYPTION_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=" # Encryption key f
 docker compose up --build
 ```
 
-
 ### 5. Access WebUI
 
 first run, init elasticsearch indexes : `http://localhost:8080/api/internal/init`
@@ -75,6 +75,25 @@ first run, init elasticsearch indexes : `http://localhost:8080/api/internal/init
 http://localhost:8080
 ```
 
+### 6. Create alerters
+
+**Discord**: 
+- Require a Discord Bot Token
+- Channel ID
+
+**Slack**:
+- Require Slack Apps token
+- Permissions:
+  - channels:read
+  - chat:write
+  - chat:write.public
+
+**Email**:
+- Require SMTP server 
+- username & password
+
+## Tips
+- You can add `KIBANA_URL` variable in settings > Variables to be able to double click on alerts and rules in the Dashboard
 
 ## 🛠 Tech Stack
 
@@ -93,6 +112,11 @@ http://localhost:8080
 
 ---
 
-## 📜 License
+## MISC
+<p align="center">    
+  <img src="./nav.gif">
+</p> 
 
-MIT © 2025 – [Lucasp381](https://github.com/Lucasp381)
+<img width="698" height="112" alt="image" src="https://github.com/user-attachments/assets/608bf684-00b8-4d71-a357-8c89f0b7e5f8" />
+
+
