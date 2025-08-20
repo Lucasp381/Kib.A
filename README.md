@@ -69,6 +69,8 @@ docker compose up --build
 
 ### 5. Access WebUI
 
+first run, init elasticsearch indexes : `http://localhost:8080/api/internal/init`
+
 ```bash
 http://localhost:8080
 ```
