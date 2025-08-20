@@ -93,6 +93,9 @@ http://localhost:8080
 
 
 
+## Tips
+- You can add `KIBANA_URL` variable in settings > Variables to be able to double click on alerts and rules in the Dashboard
+
 
 ## 🛠 Tech Stack
 
@@ -110,6 +113,11 @@ http://localhost:8080
 - [ ] Improved multi-environment configuration  
 
 ---
+
+## MISC
+<p align="center">    
+  <img src="./nav.gif">
+</p> 
 
 ## 📜 License
 
