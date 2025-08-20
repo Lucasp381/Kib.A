@@ -42,21 +42,31 @@ export default function DashboardPage() {
                 <CardDescription className="text-main-500">
                     Here you can view the latest alerts from your Kibana instance.
                 </CardDescription>
+                
+                { alerts && alerts.length > 0 ? (
                 <AlertsTable pageSize={5}/>
+                ) : (
+                    <div className="text-center text-gray-500">No alerts found.</div>
+                )}
+               
             </Card>
             <Separator />
             <Card className={cardClass}>
-                {rules && rules.length > 0 && (
+               
                     <>
                         <CardTitle className={cardTitleClass}><TitleCard Icon={<Cctv />} Title="Rules" /></CardTitle>
                         <CardDescription className="text-main-500">
                             Here you can view the latest rules from your Kibana instance.
                         </CardDescription>
-
-                        <RulesTable  />
+                    {rules && rules.length > 0 ? (
+                    <RulesTable  />
+                    ) : (
+                    <div className="text-center text-gray-500">No rules found.</div>
+                    )}
+                    
+                
                     </>
-                )
-                }
+
             </Card>
 
         </div>
