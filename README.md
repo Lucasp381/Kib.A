@@ -114,9 +114,7 @@ http://localhost:8080
 <p align="center">    
   <img src="./nav.gif">
 </p> 
-<p align="center">    
-  <img src="./nav.gif">
-</p> 
+
 <img width="698" height="112" alt="image" src="https://github.com/user-attachments/assets/608bf684-00b8-4d71-a357-8c89f0b7e5f8" />
 
 ## 📜 License
