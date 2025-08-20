@@ -1,6 +1,6 @@
 
 <p align="center">    
-  <img src="https://github.com/user-attachments/assets/1ca01099-194c-4cab-9fe8-df29cfcce998">
+  <img src="./kiba.svg">
 </p> 
 
 
