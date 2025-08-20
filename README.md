@@ -8,7 +8,7 @@
 A **simple alerting system for Kibana**.  
 You can create multiple *alerters* for each rule defined in Kibana.  
 
-⚠️ This project is still under development (i'm not a real developper and this is my first real project 🎉).  
+⚠️ This project is still under development (i'm more an Ops than a Dev and this is my first real project 🎉).  
 It uses **NestJS** for the backend, **NextJS** for the frontend, and **Elasticsearch** as the storage layer.  
 
 This is a early stage of the project, so there are still bugs and issues. 
