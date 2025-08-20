@@ -1,0 +1,7 @@
+services:
+  kiba:
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "8080:3000"

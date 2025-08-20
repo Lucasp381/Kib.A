@@ -1,0 +1,109 @@
+import React, { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Dot } from "lucide-react";
+import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter } from "@/types/alerters";
+interface AlertersMenuProps<T extends Alerter> {
+    alerters: T[];
+    editAlerter: T | null;
+    setEditAlerter: React.Dispatch<React.SetStateAction<Alerter | null>>;
+    addAlerter: React.Dispatch<React.SetStateAction<T[]>>;
+    type: T["type"];
+}
+export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter, setEditAlerter, addAlerter, type }: AlertersMenuProps<T>) {
+    return (
+        <>
+            {alerters.map((alerter: Alerter) => (
+                <React.Fragment key={alerter.id}>
+                    <Badge
+                        onClick={() => setEditAlerter(alerter)}
+                        className={`${editAlerter?.id === alerter.id ? "bg-accent" : "bg-card"
+                            } cursor-pointer justify-between w-full m-0 h-10 text-md shadow-none mr-5`}
+                    >
+                        <div className="pt-2 gap-2">
+                            <Label
+                            title={alerter.name}
+                                className={`
+                                    ${editAlerter?.name === alerter.name ? "text-accent-foreground" : "text-card-foreground"}
+                                    cursor-pointer
+                                    overflow-hidden
+                                    whitespace-nowrap
+                                    text-ellipsis
+                                    w-40 
+                                    block
+                                `}
+                            >
+                                {alerter.name}
+                            </Label>
+                            {(() => {
+                                switch (type) {
+                                    case "email":
+                                        const emailConfig = alerter.config as EmailAlerter["config"];
+                                        return <small className="text-xs text-main-900 overflow-hidden">{emailConfig.from_address}</small>;
+                                    case "discord":
+                                        const discordConfig = alerter.config as DiscordAlerter["config"];
+                                        return <small className="text-xs text-main-900 overflow-hidden">{discordConfig.channelName}</small>;
+                                    case "slack":
+                                        const slackConfig = alerter.config as SlackAlerter["config"];
+                                        return <small className="text-xs text-main-900 overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
+                                    default:
+                                        return null;
+                                }
+                            })()}
+
+                        </div>
+
+                        {(() => {
+                            switch (type) {
+                                case "email":
+                                    const emailConfig = alerter.config as EmailAlerter["config"];
+                                    return (
+                                        <Dot
+                                            className={`${alerter.enabled && emailConfig.smtp_server && emailConfig.username && emailConfig.password
+                                                ? "text-green-500"
+                                                : !emailConfig.username && !emailConfig.password
+                                                    ? "text-yellow-500"
+                                                    : "text-gray-500"
+                                                } mr-5 scale-500`}
+                                        />
+                                    )
+                                case "discord":
+                                    const discordConfig = alerter.config as DiscordAlerter["config"];
+                                    return (
+                                        <Dot
+                                            className={`${alerter.enabled && discordConfig.token && discordConfig.channelId
+                                                ? "text-green-500"
+                                                : !discordConfig.token && !discordConfig.channelId
+                                                    ? "text-yellow-500"
+                                                    : "text-gray-500"
+                                                } mr-5 scale-500`}
+                                        />
+                                    )
+                                case "slack":
+                                    const slackConfig = alerter.config as SlackAlerter["config"];
+                                    return (
+                                        <Dot
+                                            className={`${alerter.enabled && slackConfig.token && slackConfig.channelId
+                                                ? "text-green-500"
+                                                : !slackConfig.token && !slackConfig.channelId
+                                                    ? "text-yellow-500" : "text-gray-500"
+                                                } mr-5 scale-500`}
+                                        />
+                                    )
+                                default:
+                                    return null;
+                            }
+
+                        })
+                            ()}
+
+
+
+                    </Badge>
+                    <Separator />
+                </React.Fragment>
+            ))}
+        </>
+    );
+}

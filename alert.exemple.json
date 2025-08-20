@@ -1,0 +1,59 @@
+{
+  "_index": ".internal.alerts-observability.logs.alerts-default-000001",
+  "_id": "78a2aec5-4176-4148-984f-f95ce76833a5",
+  "_score": 1,
+  "_source": {
+    "kibana.alert.evaluation.threshold": -1,
+    "kibana.alert.evaluation.value": 0,
+    "kibana.alert.reason": "0 log entries in the last 5 mins. Alert when > -1.",
+    "kibana.alert.context": {
+      "matchingDocuments": 0,
+      "conditions": "_id does not match phrase 1111",
+      "group": null,
+      "isRatio": false,
+      "reason": "0 log entries in the last 5 mins. Alert when > -1."
+    },
+    "kibana.alert.rule.category": "Log threshold",
+    "kibana.alert.rule.consumer": "alerts",
+    "kibana.alert.rule.execution.uuid": "95ed748f-88fc-4b5f-9e80-4380301a75c4",
+    "kibana.alert.rule.name": "Log threshold rule",
+    "kibana.alert.rule.parameters": {
+      "timeSize": 5,
+      "timeUnit": "m",
+      "logView": "[Object]",
+      "count": "[Object]",
+      "criteria": "[Array]"
+    },
+    "kibana.alert.rule.producer": "logs",
+    "kibana.alert.rule.revision": 27,
+    "kibana.alert.rule.rule_type_id": "logs.alert.document.count",
+    "kibana.alert.rule.tags": [],
+    "kibana.alert.rule.uuid": "c1a89c6b-97f2-4925-8459-3dd08a716c5f",
+    "kibana.space_ids": [ "default" ],
+    "@timestamp": "2025-08-15T13:38:37.115Z",
+    "event.action": "open",
+    "event.kind": "signal",
+    "kibana.alert.rule.execution.timestamp": "2025-08-15T13:38:37.115Z",
+    "kibana.alert.action_group": "logs.threshold.fired",
+    "kibana.alert.flapping": false,
+    "kibana.alert.flapping_history": [
+      true,  false, false,
+      false, false, false,
+      false, true,  false,
+      true
+    ],
+    "kibana.alert.instance.id": "*",
+    "kibana.alert.maintenance_window_ids": [],
+    "kibana.alert.consecutive_matches": 1,
+    "kibana.alert.pending_recovered_count": 0,
+    "kibana.alert.status": "active",
+    "kibana.alert.uuid": "78a2aec5-4176-4148-984f-f95ce76833a5",
+    "kibana.alert.severity_improving": false,
+    "kibana.alert.workflow_status": "open",
+    "kibana.alert.duration.us": 0,
+    "kibana.alert.start": "2025-08-15T13:38:37.115Z",
+    "kibana.alert.time_range": { "gte": "2025-08-15T13:38:37.115Z" },
+    "kibana.version": "9.1.1",
+    "tags": []
+  }
+}
