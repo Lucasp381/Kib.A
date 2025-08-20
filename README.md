@@ -14,14 +14,15 @@ It uses **NestJS** for the backend, **NextJS** for the frontend, and **Elasticse
 This is a early stage of the project, so there are still bugs and issues. 
 
 
+
 ---
 
 
 ## ✅ Current Features
 
-- 🔔 **Discord Alerters**  
-- 💬 **Slack Alerters**  
-- 📧 **Email Alerters**  
+- 🔔 **Discord Alerters**  ([Discord Bot](https://discord.com/developers/docs/quick-start/overview-of-apps)) 
+- 💬 **Slack Alerters**  ([Slack App](https://api.slack.com/apps))
+- 📧 **Email Alerters**  (SMTP)
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
 
@@ -72,6 +73,25 @@ docker compose up --build
 ```bash
 http://localhost:8080
 ```
+
+### 6. Create alerters
+
+**Discord**: 
+- Require a Discord Bot Token
+- Channel ID
+
+**Slack**:
+- Require Slack Apps token
+- Permissions:
+  - channels:read
+  - chat:write
+  - chat:write.public
+
+**Email**:
+- Require SMTP server 
+- username & password
+
+
 
 
 ## 🛠 Tech Stack
