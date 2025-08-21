@@ -51,6 +51,7 @@ export async function saveDiscordAlerter(
                     if (setEditAlerter) {
                         setEditAlerter(data);
                     }
+                    toast.success("Discord alerter created successfully!");
                     return responseData
                 }else {
                     setAlerters((prevAlerters) => prevAlerters.map((alerter) => alerter.id === data.id ? data : alerter));

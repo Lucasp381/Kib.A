@@ -35,7 +35,6 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                 delete data.id;
                                 delete data.created_at;
                                 data.enabled = false; // Disable the duplicated alerter by default
-                                console.log("data", data)
                                 switch (type) {
                                     case "discord":
                                         saveDiscordAlerter(data, setAlerters as React.Dispatch<React.SetStateAction<DiscordAlerter[]>> ,setEditAlerter as React.Dispatch<React.SetStateAction<DiscordAlerter | null>>);

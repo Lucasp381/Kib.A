@@ -155,9 +155,6 @@ export default function DiscordAlerterTab({
         };
         saveDiscordAlerter(data, setAlerters, setEditAlerter);
 
-
-        console.log("alerters", alerters);
-
         setLoading(false);
         
 
@@ -268,7 +265,6 @@ export default function DiscordAlerterTab({
 
                                         <form
                                             onSubmit={form.handleSubmit((data) => {
-                                                console.log("Saving alerter data:", data);
                                                 saveDiscordAlerter(data, setAlerters);
 
                                             })}

@@ -10,7 +10,6 @@ export class EmailController {
   @Post('send')
   async send(@Body() body: any) {
     const { smtp_server, port, username, password, from_address, to_addresses, cc_addresses, subject, message } = body;
-    console.log("Sending email with body:", { body });
     if (!message) {
       throw new HttpException('Message is required', HttpStatus.BAD_REQUEST);
     }

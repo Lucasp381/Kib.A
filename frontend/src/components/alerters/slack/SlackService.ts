@@ -72,7 +72,6 @@ export async function saveSlackAlerter(
             res.json().then((responseData) => {
                 if (!data.id) {
                     data.id = responseData.response._id; // Assuming the response contains the new ID
-                    console.log(data);
                     if (setAlerters) {
                         setAlerters((prevAlerters) => [...prevAlerters, data]);
                     }

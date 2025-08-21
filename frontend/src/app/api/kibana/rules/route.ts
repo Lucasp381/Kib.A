@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const kibanaUrl = process.env.KIBANA_URL || 'http://127.0.0.1:5601';
-    console.log('Kibana URL:', kibanaUrl);
     const apiKey = process.env.ELASTIC_API_KEY;
-    console.log('API Key:', apiKey);
     const res = await fetch(`${kibanaUrl}/api/alerting/rules/_find?per_page=10000`, {
         method: 'GET',
         headers: {

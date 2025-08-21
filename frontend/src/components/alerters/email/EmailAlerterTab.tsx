@@ -186,7 +186,6 @@ export default function EmailAlerterTab({
         if (editAlerter) {
 
             if (editAlerter?.type === type) {
-                console.log("EditAlerter", editAlerter);
                 form.reset(editAlerter);
 
             }
@@ -246,7 +245,6 @@ export default function EmailAlerterTab({
                                             <Form {...form}   >
                                         <form
                                             onSubmit={form.handleSubmit((data) => {
-                                                console.log("Saving alerter data:", data);
                                                 saveEmailAlerter(data, setAlerters);
 
                                             })}

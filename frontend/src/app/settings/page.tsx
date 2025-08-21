@@ -212,7 +212,6 @@ function MainPage() {
   useEffect(() => {
     elasticKV.get("internal.defaultFiredMessageTemplate").then(res => {
       // If the response is ok and has a value, set the defaultFiredMessageTemplate
-      console.log("res", res);
       if (res.ok && res.value) setDefaultFiredMessageTemplate(res.value);
     });
     elasticKV.get("internal.defaultRecoveredMessageTemplate").then(res => {

@@ -15,7 +15,6 @@ export async function GET(
     }
 
     try {
-        console.log("token", token);
         // Create a Slack client
         const client = new WebClient(token ?? undefined);
         if (!client) {

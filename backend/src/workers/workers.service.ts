@@ -158,7 +158,6 @@ export class WorkersService implements OnModuleInit {
 
             // Slack: token can be encrypted
             console.log("Sending message to Slack channel:", alerter._source?.config.channelName),
-              console.log("Using token:", alerter._source?.config.token);
               token = alerter._source?.config.token;
               if ( this.ENCRYPTION_KEY !== undefined ){
                  token = await this.cryptService.decrypt(alerter._source?.config.token, this.ENCRYPTION_KEY);

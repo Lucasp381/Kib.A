@@ -17,7 +17,6 @@ export class EmailService {
     subject: string,
     message: string,
   alert?: any) {
-    console.log("Sending email with body:", { message });
 
     if (!smtp_server || !port || !username || !password || !to_addresses) {
       return 
@@ -25,6 +24,7 @@ export class EmailService {
     if (!message) {
       return 
     }
+    this.logger.debug(`Sending email to: ${to_addresses.join(', ')} with subject: ${subject}`);
     message = await this.utilsService.replacePlaceholders(message, alert);
     try {
     // get the channel ID from the name
@@ -46,7 +46,6 @@ export class EmailService {
       cc: cc_addresses ? cc_addresses : undefined,
   
     };
-    console.log("mailOptions", mailOptions);
   
     const info = await transporter.sendMail(mailOptions);
   

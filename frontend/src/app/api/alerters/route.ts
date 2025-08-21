@@ -132,7 +132,6 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const {id, name, type, description, enabled, config, all_rules, rules, created_at, updated_at } = body;
-    console.log("body", body);
     if( process.env.ENCRYPTION_KEY) {
         switch (type) {
             case 'discord':
