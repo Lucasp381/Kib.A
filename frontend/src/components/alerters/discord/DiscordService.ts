@@ -1,30 +1,7 @@
 import { DiscordAlerter, Alerter } from "@/types/alerters";
 import { toast } from "sonner";
 import { encrypt, decrypt } from "@/lib/crypt";
-export function sendTestMessage(token: string, channelId: string, message: string) {
-    return fetch(`/api/alerters/discord/send`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
 
-        },
-        body: JSON.stringify({ id: channelId, token: token, message: message }),
-    })
-        .then((res) => {
-            if (!res.ok) {
-                throw new Error(`Discord API error: ${res.statusText}`);
-            }
-            return res.json();
-        })
-        .then((data) => {
-            console.log("Test message sent successfully:", data);
-            return data;
-        })
-        .catch((error) => {
-            console.error("Error sending test message:", error);
-            throw error;
-        });
-}
 
 
 export async function checkDiscordAlerterExists(name: string): Promise<boolean> {

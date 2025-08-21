@@ -16,37 +16,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
   }
   // get the channel ID from the name
-  let client;
-  try {
-    client = new WebClient(token);
-
-  }catch (error) {
-    console.error("Error creating Slack client:", error);
-    return NextResponse.json({ error: "Failed to create Slack client" }, { status: 500 });
-  }
-    // Fetch the Slack channel information
-    const conversationsList = await client.conversations.list();
-    const channel = conversationsList.channels?.find((channel) => channel.name === name);
-  if (!channel) {
-    return NextResponse.json({ error: `Channel "${name}" not found` }, { status: 404 });
-  }
-
-  if (!channel.id) {
-    return NextResponse.json({ error: "Channel ID is missing" }, { status:
-  500 });
-  }
+  
 
   try {
-    const slackMsg = await client.chat.postMessage({
-      channel: channel.id,
-      text: message,
+
+     const response = await fetch(process.env.BACKEND_URL + `/alerters/slack/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token,
+        target: name,
+        message,
+      }),
     });
-    if (!slackMsg.ok) {
-      return NextResponse.json({ error: `Failed to send message: ${slackMsg.error}` }, { status: 500 });
+
+    if (!response.ok) {
+      return NextResponse.json({ error: `Failed to send message: ${response.statusText}` }, { status: 500 });
     }
-    // Return the response with the channel name and message
-   
-    return NextResponse.json({ success: true, slackMsg }, { status: 200 });
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     return NextResponse.json(
       { error: `Failed to send message: ${err instanceof Error ? err.message : "Unknown error"}` },

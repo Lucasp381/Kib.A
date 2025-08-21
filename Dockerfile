@@ -41,7 +41,7 @@
     # Variables d’environnement (ajoute ce dont tu as besoin)
     ENV PORT=3000
     ENV BACKEND_PORT=3001
-    
+    ENV BACKEND_URL=http://localhost:3001
     # Exposer seulement le frontend
     EXPOSE 3000
     

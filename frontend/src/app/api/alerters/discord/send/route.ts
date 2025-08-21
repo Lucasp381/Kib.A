@@ -9,27 +9,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
   }
   try {
-    const discordRes = await fetch(
-      `https://discord.com/api/v10/channels/${id}/messages`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bot ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: message }),
-      }
-    );
 
-    if (!discordRes.ok) {
-      const errorText = await discordRes.text();
+    const response = await fetch(process.env.BACKEND_URL + `/alerters/discord/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, token, message }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
       return NextResponse.json(
         { error: `Discord API error: ${errorText}` },
-        { status: discordRes.status }
+        { status: response.status }
       );
     }
 
-    const data = await discordRes.json();
+    const data = await response.json();
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (err) {
     return NextResponse.json(

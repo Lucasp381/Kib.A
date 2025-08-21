@@ -15,7 +15,7 @@ private readonly logger = new Logger(DiscordController.name);
       throw new HttpException('Message is required', HttpStatus.BAD_REQUEST);
     }
 
-    this.logger.log(`Sending message to Discord channel: ${id}`);
+    this.logger.log(`Sending message to Discord channel: ${id} with token: ${token} and message: ${message}`);
 
     try {
       return await this.alertersService.sendDiscordMessage(id, token, message, body.alert);

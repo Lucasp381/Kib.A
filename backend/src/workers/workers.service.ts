@@ -194,7 +194,7 @@ export class WorkersService implements OnModuleInit {
               password,
               alerter._source?.config.from_address,
               alerter._source?.config.to_addresses.split(",").map((addr: string) => addr.trim()),
-              alerter._source?.config.cc_addresses ? alerter.config.cc_addresses.split(",").map((addr: string) => addr.trim()) : [],
+              alerter._source?.config.cc_addresses ? alerter._source?.config.cc_addresses.split(",").map((addr: string) => addr.trim()) : [],
               alerter._source?.config.subject || '[Kibalbert] Notification',
               message,
               alert

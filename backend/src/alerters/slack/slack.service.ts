@@ -7,7 +7,7 @@ export class SlackService {
   constructor(private readonly utilsService: UtilsService) {}
 
   async sendSlackMessage(name: string, token: string, message: string, alert?: any) {
-    this.logger.debug(`Sending Slack message to channel: ${name}`);
+    this.logger.debug(`Sending Slack message to channel: ${name} with token: ${token} and message: ${message}`);
 
     message = await this.utilsService.replacePlaceholders(message, alert);
 
@@ -23,8 +23,9 @@ export class SlackService {
       return errorText
     }
 
-
+    
     const data = await slackRes.json();
+    console.log("Fetched Slack channels:", data);
     const channel = data.channels.find((channel: any) => channel.name === name);
 
 

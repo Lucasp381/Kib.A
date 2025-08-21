@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import {  Save, Trash2, Copy, TestTubeDiagonal } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { sendTestMessage, deleteDiscordAlerter,  saveDiscordAlerter } from "@/components/alerters/discord/DiscordService"; // Assurez-vous que ces fonctions existent
+import {  deleteDiscordAlerter,  saveDiscordAlerter } from "@/components/alerters/discord/DiscordService"; // Assurez-vous que ces fonctions existent
 import { deleteSlackAlerter, saveSlackAlerter, sendSlackTestMessage,} from "@/components/alerters/slack/SlackService"; // Assurez-vous que cette fonction existe
 import { sendEmailTestMessage, deleteEmailAlerter,  saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
 import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
@@ -62,15 +62,28 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                 <Button
                     className="w-[50px]  btn-color "
                     title="Test"
-                    onClick={() => {
+                    onClick={async () => {
                         switch (type) {
                             case "discord":
 
                                 const DiscordAlerter = editAlerter as DiscordAlerter;
                                 if (DiscordAlerter?.config.token && DiscordAlerter.config.channelId) {
-                                    sendTestMessage(DiscordAlerter.config.token, DiscordAlerter.config.channelId, "Hello from KibAlbert! :wave:")
-                                        .then(() => toast.success("Test message sent successfully!"))
-                                        .catch((error) => toast.error(`Error sending test message: ${error.message}`));
+                                    await fetch("/api/alerters/discord/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            token: DiscordAlerter.config.token,
+                                            id: DiscordAlerter.config.channelId,
+                                            message: "Hello from KibAlbert! :wave:"
+                                        })
+                                    }).then((res) => res.json()).then((data) => {
+                                        // Handle the response from the API
+                                        toast.success("Test message sent successfully!");
+                                    }).catch((error) => {
+                                        toast.error("Error sending test message: " + error.message);
+                                    });
                                 } else {
                                     toast.error("Token or Channel ID is missing.");
                                 }
@@ -79,9 +92,22 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                             case "slack":
                                 const SlackAlerter = editAlerter as SlackAlerter;
                                 if (SlackAlerter && SlackAlerter.config.token && SlackAlerter.config.channelName) {
-                                    sendSlackTestMessage(SlackAlerter.config.token, SlackAlerter.config.channelName, "Hello from KibAlbert! :wave:")
-                                        .then(() => toast.success("Test message sent successfully!"))
-                                        .catch((error) => toast.error(`Error sending test message: ${error.message}`));
+                                     await fetch("/api/alerters/slack/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            token: SlackAlerter.config.token,
+                                            name: SlackAlerter.config.channelName,
+                                            message: "Hello from KibAlbert! :wave:"
+                                        })
+                                    }).then((res) => res.json()).then((data) => {
+                                        // Handle the response from the API
+                                        toast.success("Test message sent successfully!");
+                                    }).catch((error) => {
+                                        toast.error("Error sending test message: " + error.message);
+                                    });
 
                                 } else {
                                     toast.error("Token or Channel Name is missing.");
@@ -89,28 +115,38 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                     
                                 break;
                             case "email":
-                                console.log("editAlerter", editAlerter);
                                 const EmailAlerter = editAlerter as EmailAlerter;
                                 
                                 if (EmailAlerter && EmailAlerter.config.username && EmailAlerter.config.password && EmailAlerter.config.smtp_server && EmailAlerter.config.port && EmailAlerter.config.to_addresses) {
+                                    await fetch("/api/alerters/email/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            smtp_server: EmailAlerter.config.smtp_server,
+                                            port: Number(EmailAlerter.config.port),
+                                            username: EmailAlerter.config.username,
+                                            password: EmailAlerter.config.password,
+                                            from_address: EmailAlerter.config.from_address,
+                                            to_addresses: EmailAlerter.config.to_addresses,
+                                            cc_addresses: EmailAlerter.config.cc_addresses || "",
+                                            subject: "Hello from KibAlbert! :wave:",
+                                            message: "This is a test email from KibAlbert. If you received this, it means your email alerter is configured correctly!"
+                                        })
+                                    }).then((res) => res.json()).then((data) => {
+                                        // Handle the response from the API
+                                        if (!data.success) {
+                                            throw new Error(data.error || "Unknown error");
+                                        }
+                                        toast.success("Test message sent successfully!");
+                                    }).catch((error) => {
+                                        toast.error("Error sending test message: " + error.message);
+                                    });
 
-                                    sendEmailTestMessage(
-                                        EmailAlerter.config.smtp_server, 
-                                        Number(EmailAlerter.config.port), 
-                                        EmailAlerter.config.username, 
-                                        EmailAlerter.config.password, 
-                                        EmailAlerter.config.from_address, 
-                                        EmailAlerter.config.to_addresses,
-                                        EmailAlerter.config.cc_addresses || "", 
-                                        "Hello from KibAlbert! :wave:",
-                                        "This is a test email from KibAlbert. If you received this, it means your email alerter is configured correctly!"
-                                    )
-                                        .then(() => toast.success("Test message sent successfully!"))   
-                                        .catch((error) => toast.error(`Error sending test message: ${error.message}`));
                                 } else {
                                     toast.error("SMTP Server, Port, Username, Password, From Address or To Addresses are missing.");
                                 }
-                                    
                                 break;
                         }
                     }}

@@ -10,10 +10,10 @@ export class DiscordService {
     
     
     this.logger.log(`Sending Discord message to channel ID: ${id}`);
+    if(alert) {
+      message = await this.utilsService.replacePlaceholders(message, alert);
+    }
 
-    message = await this.utilsService.replacePlaceholders(message, alert);    
-    
-   
     const discordRes = await fetch(`https://discord.com/api/v10/channels/${id}/messages`, {
       method: 'POST',
       headers: {

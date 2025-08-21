@@ -17,7 +17,7 @@ export class EmailService {
     subject: string,
     message: string,
   alert?: any) {
-    this.logger.log("Sending Email")
+    console.log("Sending email with body:", { message });
 
     if (!smtp_server || !port || !username || !password || !to_addresses) {
       return 
