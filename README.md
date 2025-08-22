@@ -113,6 +113,7 @@ http://localhost:8080
 - [x] Add Microsoft Teams integration  
 - [X] Dockerized deployment
 - [ ] Add Telegram & Custom alerters
+- [ ] Add alerts data to placeholders context menu
 
 ---
 
