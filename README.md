@@ -88,6 +88,9 @@ http://localhost:8080
   - channels:read
   - chat:write
   - chat:write.public
+  - 
+**Teams**:
+- Webook url
 
 **Email**:
 - Require SMTP server 
