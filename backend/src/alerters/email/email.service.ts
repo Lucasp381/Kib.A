@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import nodemailer from 'nodemailer';
 import { UtilsService } from '../../utils/utils.service';
+import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class EmailService {
@@ -24,8 +25,10 @@ export class EmailService {
     if (!message) {
       return 
     }
-    this.logger.debug(`Sending email to: ${to_addresses.join(', ')} with subject: ${subject}`);
+    this.logger.debug(`Sending email to: ${to_addresses} with subject: ${subject}`);
     message = await this.utilsService.replacePlaceholders(message, alert);
+    // Sanitize message
+    message = sanitizeHtml(message);
     try {
     // get the channel ID from the name
     const transporter = nodemailer.createTransport({

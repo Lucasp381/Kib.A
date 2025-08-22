@@ -18,8 +18,16 @@ export class TeamsService {
   if (!message) {
     throw new HttpException('Message is required', HttpStatus.BAD_REQUEST);
   }
+  const webhookUrlPattern = /^https:\/\/(?:outlook\.office\.com|[a-zA-Z0-9.-]+\.webhook\.office\.com)\/webhookb?2?\/[0-9a-fA-F-]+@[0-9a-fA-F-]+\/IncomingWebhook\/[0-9a-fA-F-]+\/[0-9a-fA-F-]+(?:\/[0-9a-zA-Z-_]+)$/;
+
+  if (!webhookUrlPattern.test(webhook)) {
+   
+    throw new HttpException('Invalid Webhook URL', HttpStatus.BAD_REQUEST);
+  }
 
   let body: any;
+  // Validate Webhook URL
+ 
 
   // Fonction récursive pour remplacer les placeholders dans toutes les chaînes
   const replacePlaceholdersInObject = (obj: any, data: any): any => {

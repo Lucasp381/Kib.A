@@ -13,7 +13,10 @@ export class DiscordService {
     if(alert) {
       message = await this.utilsService.replacePlaceholders(message, alert);
     }
-
+    const idPattern = /^\d{10,20}$/;
+    if (!idPattern.test(id)) {
+      throw new HttpException('Invalid Discord channel ID', HttpStatus.BAD_REQUEST);
+    }
     const discordRes = await fetch(`https://discord.com/api/v10/channels/${id}/messages`, {
       method: 'POST',
       headers: {
