@@ -107,7 +107,7 @@ http://localhost:8080
 ## 📌 Roadmap
 
 - [x] UI for managing alerters  
-- [ ] Add Microsoft Teams integration  
+- [x] Add Microsoft Teams integration  
 - [ ] Dockerized deployment  
 - [ ] Improved multi-environment configuration  
 
