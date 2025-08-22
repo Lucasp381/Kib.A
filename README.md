@@ -88,6 +88,9 @@ http://localhost:8080
   - channels:read
   - chat:write
   - chat:write.public
+  - 
+**Teams**:
+- Webook url
 
 **Email**:
 - Require SMTP server 
@@ -107,9 +110,10 @@ http://localhost:8080
 ## 📌 Roadmap
 
 - [x] UI for managing alerters  
-- [ ] Add Microsoft Teams integration  
-- [ ] Dockerized deployment  
-- [ ] Improved multi-environment configuration  
+- [x] Add Microsoft Teams integration  
+- [X] Dockerized deployment
+- [ ] Add Telegram & Custom alerters
+- [ ] Add alerts data to placeholders context menu
 
 ---
 
