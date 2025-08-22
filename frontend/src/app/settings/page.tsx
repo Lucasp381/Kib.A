@@ -1,13 +1,11 @@
 'use client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardDescription, CardContent } from "@/components/ui/card";
 import {  useEffect, useState } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Settings } from "lucide-react";
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
 import { useElasticKV } from "@/hooks/useElasticKV";
-import TitleCard from "@/components/menu/titleCard";
 import { Label } from "@radix-ui/react-label";
 
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
@@ -19,7 +17,7 @@ function VariablesTable() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { get, set, del } = useElasticKV();
+  const { set, del } = useElasticKV();
 
   const [key, setKey] = useState('');
   const [value, setValue] = useState('');

@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { alertFieldMap, ruleFieldMap } from "@/lib/alertFieldMap";
-import { Bell, Cctv, Home, Send, Settings } from "lucide-react";
+import { Bell, Cctv } from "lucide-react";
 import TitleCard from "@/components/menu/titleCard";
 import RulesTable from "@/components/RulesTable/RulesTable";
 import AlertsTable from "@/components/AlertsTable/AlertsTable";
@@ -14,23 +13,22 @@ import AlertsTable from "@/components/AlertsTable/AlertsTable";
 export default function DashboardPage() {
     const [alerts, setAlerts] = useState([]);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
-    const alertColumns: Array<keyof typeof alertFieldMap> = Object.keys(alertFieldMap) as Array<keyof typeof alertFieldMap>;
-    const ruleColumns: Array<keyof typeof ruleFieldMap> = Object.keys(ruleFieldMap) as Array<keyof typeof ruleFieldMap>;
-    const [ruleTypeNames, setRuleTypeNames] = useState<{[id: string]: string}>({});
     useEffect(() => {
         fetch("/api/elastic/index?index=*alerts-*")
             .then((res) => res.json())
             .then((result) => {
                 setAlerts(result.data);
             });
+
+    }, []);
+
+    useEffect(() => {
         fetch("/api/kibana/rules")
             .then((res) => res.json())
             .then((data) => {
-                setRules(data);
+                setRules(data.data);
             });
     }, []);
-
-   
 
     const cardClass = "p-6 border-none  border-blue-300 shadow-none rounded-none bg-herit pb-0 max-h-[80vh]";
     const cardTitleClass = "text-xl font-bold mb-0";
@@ -44,7 +42,7 @@ export default function DashboardPage() {
                 </CardDescription>
                 
                 { alerts && alerts.length > 0 ? (
-                <AlertsTable pageSize={5}/>
+                <AlertsTable pageSize={10}/>
                 ) : (
                     <div className="text-center text-gray-500">No alerts found.</div>
                 )}

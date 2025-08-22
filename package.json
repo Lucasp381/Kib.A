@@ -1,5 +1,5 @@
 {
-  "name": "kibalbert",
+  "name": "kib.a",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,16 +10,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lucasp381/kibalbert.git"
+    "url": "git+https://github.com/Lucasp381/kib.a.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Lucasp381/kibalbert/issues"
+    "url": "https://github.com/Lucasp381/kib.a/issues"
   },
-  "homepage": "https://github.com/Lucasp381/kibalbert#readme",
+  "homepage": "https://github.com/Lucasp381/kib.a#readme",
   "devDependencies": {
     "@types/nodemailer": "^7.0.0",
     "concurrently": "^9.2.0"

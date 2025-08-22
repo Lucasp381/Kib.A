@@ -1,6 +1,6 @@
 
 <p align="center">    
-  <img src="./kiba.svg">
+  <img src="./github/kiba.svg">
 </p> 
 
 
@@ -23,11 +23,12 @@ This is a early stage of the project, so there are still bugs and issues.
 - 🔔 **Discord Alerters**  ([Discord Bot](https://discord.com/developers/docs/quick-start/overview-of-apps)) 
 - 💬 **Slack Alerters**  ([Slack App](https://api.slack.com/apps))
 - 📧 **Email Alerters**  (SMTP)
+- 🚨 **Teams Alerters** ([Webhook](https://learn.microsoft.com/fr-fr/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) & [AdaptiveCards](https://adaptivecards.microsoft.com/designer))
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
 
 <p align="center">
-  <img src="emoji-placeholders.gif" />
+  <img src="github/emoji-placeholders.gif" />
 </p>
 
  
@@ -112,11 +113,13 @@ http://localhost:8080
 
 ---
 
-## MISC
-<p align="center">    
-  <img src="./nav.gif">
-</p> 
+## Screenshots
+|                                                        |                                                       |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
+| ![](./github/dashboard.png)                                 | ![](./github/dashboard-d.png)|
+| ![](./github/alerters-discord.png)                          | ![](./github/alerters-teams.png  )|
+| ![](./github/teams-alert.png)                            | ![](./github/discord-alert.png)|
 
-<img width="698" height="112" alt="image" src="https://github.com/user-attachments/assets/608bf684-00b8-4d71-a357-8c89f0b7e5f8" />
+
 
 

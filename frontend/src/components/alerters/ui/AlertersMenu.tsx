@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Dot } from "lucide-react";
-import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter } from "@/types/alerters";
+import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter, TeamsAlerter } from "@/types/alerters";
 interface AlertersMenuProps<T extends Alerter> {
     alerters: T[];
     editAlerter: T | null;
@@ -47,6 +47,9 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                     case "slack":
                                         const slackConfig = alerter.config as SlackAlerter["config"];
                                         return <small className="text-xs text-main-900 overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
+                                    case "teams":
+                                        const teamsConfig = alerter.config as TeamsAlerter["config"];
+                                        {alerter ? <small className="text-xs text-main-900 overflow-hidden">ddd</small> : null}
                                     default:
                                         return null;
                                 }
@@ -88,6 +91,18 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                                 ? "text-green-500"
                                                 : !slackConfig.token && !slackConfig.channelId
                                                     ? "text-yellow-500" : "text-gray-500"
+                                                } mr-5 scale-500`}
+                                        />
+                                    )
+                                case "teams":
+                                    const teamsConfig = alerter.config as TeamsAlerter["config"];
+                                    return (
+                                        <Dot
+                                            className={`${alerter.enabled && teamsConfig.webhook
+                                                ? "text-green-500"
+                                                : !teamsConfig.webhook
+                                                    ? "text-yellow-500"
+                                                    : "text-gray-500"
                                                 } mr-5 scale-500`}
                                         />
                                     )

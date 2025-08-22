@@ -18,7 +18,7 @@ export class VariablesService {
 
   async findAll() {
     this.logger.log('Fetching all variables');
-    const index = 'kibalert-variables';
+    const index = `${process.env.KIBALERT_INDEX_PREFIX}-variables`;
    const res = await this.esService.search(index, {
       query: {
         match_all: {},
@@ -38,8 +38,8 @@ export class VariablesService {
 
   async findOne(id: string) {
     this.logger.log(`Fetching variable with id: ${id}`);
-    
-    const index = 'kibalert-variables';
+
+    const index = `${process.env.KIBALERT_INDEX_PREFIX}-variables`;
     const res = await this.esService.search(index, {
       query: {
         term: { _id: id },
@@ -55,7 +55,7 @@ export class VariablesService {
 
   update(id: string, updateVariableDto: UpdateVariableDto) {
     this.logger.log(`Updating variable #${id} with data: ${JSON.stringify(updateVariableDto)}`);
-    const index = 'kibalert-variables';
+    const index = `${process.env.KIBALERT_INDEX_PREFIX}-variables`;
     this.esService.index(index, {
       ...updateVariableDto,
       _id: id,
@@ -65,8 +65,8 @@ export class VariablesService {
 
   remove(id: string) {
     this.logger.log(`Removing variable with id: ${id}`);
-    const index = 'kibalert-variables';
-    
+    const index = `${process.env.KIBALERT_INDEX_PREFIX}-variables`;
+
     this.esService.delete(index, id);
 
     this.logger.log(`Variable with id ${id} removed successfully`);

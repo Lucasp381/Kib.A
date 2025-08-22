@@ -4,9 +4,10 @@ import {  Save, Trash2, Copy, TestTubeDiagonal } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import {  deleteDiscordAlerter,  saveDiscordAlerter } from "@/components/alerters/discord/DiscordService"; // Assurez-vous que ces fonctions existent
-import { deleteSlackAlerter, saveSlackAlerter, sendSlackTestMessage,} from "@/components/alerters/slack/SlackService"; // Assurez-vous que cette fonction existe
-import { sendEmailTestMessage, deleteEmailAlerter,  saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
-import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
+import { deleteSlackAlerter, saveSlackAlerter} from "@/components/alerters/slack/SlackService"; // Assurez-vous que cette fonction existe
+import { deleteEmailAlerter,  saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
+import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter, TeamsAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
+import { deleteTeamsAlerter, saveTeamsAlerter } from "../teams/TeamsService";
 
 interface EditButtonProps<T extends Alerter> {
     editAlerter: T | null;
@@ -45,8 +46,10 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                     case "email":
                                         saveEmailAlerter(data, setAlerters as React.Dispatch<React.SetStateAction<EmailAlerter[]>> , setEditAlerter as React.Dispatch<React.SetStateAction<EmailAlerter | null>>);
                                         break;
+                                    case "teams":
+                                        saveTeamsAlerter(data, setAlerters as React.Dispatch<React.SetStateAction<TeamsAlerter[]>> , setEditAlerter as React.Dispatch<React.SetStateAction<TeamsAlerter | null>>);
+                                        break;
 
-                                        
                                 }
 
                                 toast.success("Alerter duplicated successfully!");
@@ -147,6 +150,37 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                     toast.error("SMTP Server, Port, Username, Password, From Address or To Addresses are missing.");
                                 }
                                 break;
+                                case "teams":
+                                    const TeamsAlerter = editAlerter as TeamsAlerter;
+
+                                    if (TeamsAlerter && TeamsAlerter.config.webhook) {
+                                        console.log(`Sending test message to Teams channel: ${TeamsAlerter.config.webhook}`);
+
+                                        await fetch("/api/alerters/teams/send", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                webhook: TeamsAlerter.config.webhook,
+                                                message: "This is a test message from Kib.A. If you received this, it means your Teams alerter is configured correctly!",
+                                                isAdaptiveCard: false
+                                            })
+                                        }).then((res) => res.json()).then((data) => {
+                                            // Handle the response from the API
+                                            if (!data.success) {
+                                                throw new Error(data.error || "Unknown error");
+                                            }
+                                            toast.success("Test message sent successfully!");
+                                        }).catch((error) => {
+                                            toast.error("Error sending test message: " + error.message);
+                                        });
+
+                                    } else {
+                                        toast.error("Token or Channel Name is missing.");
+                                    }
+
+                                    break;
                         }
                     }}
                     type="button"
@@ -167,6 +201,9 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                 break;
                             case "email":
                                 deleteEmailAlerter(editAlerter?.id || "", alerters as EmailAlerter[], setAlerters as React.Dispatch<React.SetStateAction<EmailAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<EmailAlerter | null>>);
+                                break;
+                            case "teams":
+                                deleteTeamsAlerter(editAlerter?.id || "", alerters as TeamsAlerter[], setAlerters as React.Dispatch<React.SetStateAction<TeamsAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<TeamsAlerter | null>>);
                                 break;
                         }
 

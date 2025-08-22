@@ -6,19 +6,33 @@ export async function GET(request: Request) {
   const index = searchParams.get('index');
   const limit = parseInt(searchParams.get('limit') || '10', 10);
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const FieldMustExist = searchParams.get('FieldMustExist');
 
   if (!index) {
     return NextResponse.json({ error: 'Missing index parameter' }, { status: 400 });
   }
 
   try {
+    let query
+    if (FieldMustExist) {
+      query = {
+        bool: {
+          must: [
+            { match_all: {} },
+            { exists: { field: FieldMustExist } }
+          ]
+        }
+      }
+    } else {
+      query = { match_all: {} }
+    }
     const response = await esClient.search({
       index,
       from: (page - 1) * limit,
       size: limit,
-      query: { match_all: {} },
+      query,
     });
-
+    
     const totalHits =
       typeof response.hits.total === 'number' ? response.hits.total : response.hits.total?.value;
 

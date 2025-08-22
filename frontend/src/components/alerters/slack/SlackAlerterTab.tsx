@@ -13,7 +13,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import AlertersMenu from "@/components/alerters/ui/AlertersMenu";
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
 
-import { Plus, Dot } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,7 @@ import { z } from "zod";
 import {  saveSlackAlerter } from "@/components/alerters/slack/SlackService";
 import EditButton from "@/components/alerters/ui/EditButton";
 import { SlackAlerter, Alerter } from "@/types/alerters";
-import { fa } from "zod/v4/locales";
+
 
 const type = "slack";
 
@@ -121,10 +121,10 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
     }, [initialValues]);
 
     useEffect(() => {
-        fetch("/api/kibana/rules")
+        fetch("/api/kibana/rules?limit=10000")
             .then((res) => res.json())
             .then((data) => {
-                setRules(data);
+                setRules(data.data);
                 const { channelName, token } = form.getValues().config;
                 if (channelName && token) {
                     getSlackChannelId(channelName, token).then((id) => {
@@ -331,7 +331,7 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                                                                             id="firedMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
-                                                                            placeholder="Alert: {alertName}"
+                                                                            placeholder="Alert: {_source.kibana.alert.rule.name}"
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
@@ -353,7 +353,7 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                                                                             id="recoveredMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
-                                                                            placeholder="Alert: {alertName}"
+                                                                            placeholder="Alert: {_source.kibana.alert.rule.name}"
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>

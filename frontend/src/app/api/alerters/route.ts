@@ -3,8 +3,7 @@ import { estypes } from '@elastic/elasticsearch'
 import { esClient} from '@/lib/elasticsearch';
 import { encrypt, decrypt } from '@/lib/crypt';
 import { Alerter, EmailAlerter } from '@/types/alerters';
-import { de } from 'zod/v4/locales';
-const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kibalert';
+const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kiba';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);

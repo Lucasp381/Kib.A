@@ -1,6 +1,5 @@
-import { DiscordAlerter, Alerter } from "@/types/alerters";
+import { DiscordAlerter } from "@/types/alerters";
 import { toast } from "sonner";
-import { encrypt, decrypt } from "@/lib/crypt";
 
 
 
@@ -53,45 +52,47 @@ export async function saveDiscordAlerter(
                     }
                     toast.success("Discord alerter created successfully!");
                     return responseData
-                }else {
+                } else {
                     setAlerters((prevAlerters) => prevAlerters.map((alerter) => alerter.id === data.id ? data : alerter));
+                    toast.success("Alerter updated successfully!");
+                    return responseData
                 }
 
             });
-           
+
         })
         .catch((err) => {
             console.error("Erreur lors de la mise à jour du Discord alerter :", err);
         })
-         .finally(() => {
+        .finally(() => {
         })
         ;
 
 }
 
-export async  function deleteDiscordAlerter(id: string, alerters : DiscordAlerter[], setAlerters: React.Dispatch<React.SetStateAction<DiscordAlerter[]>>, setEditAlerter?: React.Dispatch<React.SetStateAction<DiscordAlerter | null>>) {
-        if (!id) {
-            return;
-        }
-        if (!window.confirm("Are you sure you want to delete this Discord alerter?")) {
-            return;
-        }
-         await fetch(`/api/alerters?id=${id}`, {
-            method: "DELETE",
-        })
-            .then((res) => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                toast.success("Alerter deleted successfully!");
-             
-                setAlerters((prevAlerters) => prevAlerters.filter((alerter) => alerter.id !== id));
-                if (setEditAlerter) {
-                    setEditAlerter(alerters.length > 0 ? alerters[0] : null);
-                }
-                  
-                return res.json();
-            })
-            
-            .catch((err) => {
-                console.error("Erreur lors de la suppression du Discord alerter :", err);
-            });
+export async function deleteDiscordAlerter(id: string, alerters: DiscordAlerter[], setAlerters: React.Dispatch<React.SetStateAction<DiscordAlerter[]>>, setEditAlerter?: React.Dispatch<React.SetStateAction<DiscordAlerter | null>>) {
+    if (!id) {
+        return;
     }
+    if (!window.confirm("Are you sure you want to delete this Discord alerter?")) {
+        return;
+    }
+    await fetch(`/api/alerters?id=${id}`, {
+        method: "DELETE",
+    })
+        .then((res) => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            toast.success("Alerter deleted successfully!");
+
+            setAlerters((prevAlerters) => prevAlerters.filter((alerter) => alerter.id !== id));
+            if (setEditAlerter) {
+                setEditAlerter(alerters.length > 0 ? alerters[0] : null);
+            }
+
+            return res.json();
+        })
+
+        .catch((err) => {
+            console.error("Erreur lors de la suppression du Discord alerter :", err);
+        });
+}

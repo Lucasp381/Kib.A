@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { esClient, getKeyValue, setKeyValue } from '@/lib/elasticsearch';
 import { estypes } from '@elastic/elasticsearch'
 
-const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kibalert';
+const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kiba';
 type Variable = {
     id: string;
     data: string;

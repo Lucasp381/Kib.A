@@ -1,10 +1,9 @@
 // components/AlertsTable/AlertsTable.tsx
 import { useState, useEffect } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { alertFieldMap, ruleFieldMap } from "@/lib/alertFieldMap";
+import { alertFieldMap } from "@/lib/alertFieldMap";
 import { Badge } from "@/components/ui/badge";
 import { ObservabilityAlert } from "@/types/alerts";
-import { Scroll } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useElasticKV } from "@/hooks/useElasticKV";
@@ -17,8 +16,7 @@ interface AlertsTableProps {
 
 
 export default  function AlertsTable({ pageSize = 15 }: AlertsTableProps) {
-
-  const {get, set, del} = useElasticKV();
+  const {get} = useElasticKV();
   const [KIBANA_URL, setKIBANA_URL] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<ObservabilityAlert[]>([]);
   const [page, setPage] = useState(1);
@@ -26,18 +24,15 @@ export default  function AlertsTable({ pageSize = 15 }: AlertsTableProps) {
   const alertColumns: Array<keyof typeof alertFieldMap> = Object.keys(alertFieldMap) as Array<keyof typeof alertFieldMap>;
 
   const fetchAlerts = async (page: number) => {
-    const url = await get('KIBANA_URL').then((response) => {
+    await get('KIBANA_URL').then((response) => {
       if (response.ok && response.value) {
         setKIBANA_URL(response.value);
-        return response.value;
-      } else {
-        return null;
       }
     });
     
 
     const res = await fetch(
-      `/api/elastic/index?index=*alerts-*&limit=${pageSize}&page=${page}`,
+      `/api/elastic/index?index=*alerts-*&limit=${pageSize}&page=${page}&FieldMustExist=kibana.alert.rule.uuid`,
     );
     const result = await res.json();
     setAlerts(result.data);

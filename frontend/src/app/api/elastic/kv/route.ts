@@ -1,4 +1,4 @@
-// kibalert/src/app/api/elastic/kv/route.ts
+// kib.a/src/app/api/elastic/kv/route.ts
 import { esClient } from '@/lib/elasticsearch';
 const index = process.env.KIBALERT_INDEX_PREFIX + '-variables';
 export async function POST(req: Request) {

@@ -29,7 +29,9 @@ import { DiscordAlerter } from "@/types/alerters"; // Assurez-vous que ce type e
 import { Alerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import AlertersMenu from "@/components/alerters/ui/AlertersMenu";
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
+
 const type = "discord"; // Définir le type d'alerter
+
 export const FormSchema = z.object({
     "id": z.string().optional(),
     "name": z.string().min(1, {
@@ -182,10 +184,10 @@ export default function DiscordAlerterTab({
         }
     }, [initialValues]);
     useEffect(() => {
-        fetch("/api/kibana/rules")
+        fetch("/api/kibana/rules?limit=10000")
             .then((res) => res.json())
             .then((data) => {
-                setRules(data);
+                setRules(data.data);
 
                 const channelId = form.getValues("config.channelId");
                 const token = form.getValues("config.token");
@@ -441,7 +443,7 @@ export default function DiscordAlerterTab({
                                                                             id="firedMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
-                                                                            placeholder="Alert: {alertName}"
+                                                                            placeholder="Alert: {_source.kibana.alert.rule.name}"
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
@@ -465,7 +467,7 @@ export default function DiscordAlerterTab({
                                                                             id="recoveredMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
-                                                                            placeholder="Alert: {alertName}"
+                                                                            placeholder="Alert: {_source.kibana.alert.rule.name}"
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>

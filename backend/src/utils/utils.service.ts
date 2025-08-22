@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UtilsService {
-    private getValue(obj: any, path: string) {
+    public  getValue(obj: any, path: string) {
         if (obj == null) return undefined;
     
         // 1) Essai de clé exacte au niveau courant

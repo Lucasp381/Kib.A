@@ -3,7 +3,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Switch } from "@/components/ui/switch";
-import { Home, Bell, Settings, Send, Cctv } from "lucide-react";
+import { Home, Settings, Send  } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { MenuButton } from "@/components/menu/menuButton";

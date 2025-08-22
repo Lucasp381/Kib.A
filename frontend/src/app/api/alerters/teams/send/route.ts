@@ -3,31 +3,29 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json(); // Read JSON body
-  const { name, token, message} = body;
+  const { webhook, message, payload} = body;
 
-  if (!name) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  if (!message && !payload) {
+    return NextResponse.json({ error: "message or payload is required" }, { status: 400 });
   }
-  if (!token) {
-    return NextResponse.json({ error: "Token is required" }, { status: 400 });
+  if (!webhook) {
+    return NextResponse.json({ error: "Webhook URL is required" }, { status: 400 });
   }
-  if (!message) {
-    return NextResponse.json({ error: "Message is required" }, { status: 400 });
-  }
+
   // get the channel ID from the name
   
 
   try {
 
-     const response = await fetch(process.env.BACKEND_URL + `/alerters/slack/send`, {
+     const response = await fetch(process.env.BACKEND_URL + `/alerters/teams/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token,
-        target: name,
+        webhook,
         message,
+        payload,
       }),
     });
 

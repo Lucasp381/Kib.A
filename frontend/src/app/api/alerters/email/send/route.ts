@@ -1,6 +1,5 @@
 // app/api/alerters/email/route.ts
 import { NextResponse } from "next/server";
-import  nodemailer from "nodemailer"; 
 
 export async function POST(req: Request) {
   const body = await req.json(); // Read JSON body

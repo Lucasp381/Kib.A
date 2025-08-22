@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import DiscordAlerterTab from "@/components/alerters/discord/DiscordAlerterTab";
 import SlackAlerterTab from '@/components/alerters/slack/SlackAlerterTab';
 import EmailAlerterTab from '@/components/alerters/email/EmailAlerterTab';
+import TeamsAlerterTab from '@/components/alerters/teams/TeamsAlerterTab';
 
 import { Alerter } from "@/types/alerters";
 const cardClass = "p-6 border-none border-gray-300 shadow-none rounded-none bg-herit";
@@ -97,7 +98,12 @@ export default function AlertersView() {
                         />
                       )
                     case "teams":
-                      return <Card className='text-2xl text-center  h-[calc(100vh-190px)] flex items-center justify-center'><FontAwesomeIcon icon={faHelmetSafety} className='scale-300 text-main-500' />{tab.value.charAt(0).toUpperCase() + tab.value.slice(1)} alerter is not implemented yet.</Card>;
+                      return (
+                        <TeamsAlerterTab
+                          alerters={alerters}
+                          initialValues={editAlerter ?? undefined}
+                        />
+                      );
                     case "email":
                       return (
                         <EmailAlerterTab
