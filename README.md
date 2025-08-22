@@ -108,8 +108,8 @@ http://localhost:8080
 
 - [x] UI for managing alerters  
 - [x] Add Microsoft Teams integration  
-- [ ] Dockerized deployment  
-- [ ] Improved multi-environment configuration  
+- [X] Dockerized deployment
+- [ ] Add Telegram & Custom alerters
 
 ---
 
