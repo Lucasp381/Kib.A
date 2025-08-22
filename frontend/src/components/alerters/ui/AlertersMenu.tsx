@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Dot } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter, TeamsAlerter } from "@/types/alerters";
 interface AlertersMenuProps<T extends Alerter> {
     alerters: T[];
@@ -13,17 +14,18 @@ interface AlertersMenuProps<T extends Alerter> {
 }
 export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter, setEditAlerter, addAlerter, type }: AlertersMenuProps<T>) {
     return (
-        <>
+
+        <ScrollArea className="max-h-[calc(100vh-300px)] w-full">
             {alerters.map((alerter: Alerter) => (
                 <React.Fragment key={alerter.id}>
                     <Badge
                         onClick={() => setEditAlerter(alerter)}
                         className={`${editAlerter?.id === alerter.id ? "bg-accent" : "bg-card"
-                            } cursor-pointer justify-between w-full m-0 h-10 text-md shadow-none mr-5`}
+                            } cursor-pointer justify-between w-full m-0 h-15  text-md shadow-none mr-5`}
                     >
-                        <div className="pt-2 gap-2">
+                        <div className="pt-2 gap-2 max-w-45 overflow-hidden">
                             <Label
-                            title={alerter.name}
+                                title={alerter.name}
                                 className={`
                                     ${editAlerter?.name === alerter.name ? "text-accent-foreground" : "text-card-foreground"}
                                     cursor-pointer
@@ -31,7 +33,7 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                     whitespace-nowrap
                                     text-ellipsis
                                     w-40 
-                                    block
+                                    max-w-62
                                 `}
                             >
                                 {alerter.name}
@@ -40,16 +42,18 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                 switch (type) {
                                     case "email":
                                         const emailConfig = alerter.config as EmailAlerter["config"];
-                                        return <small className="text-xs text-main-900 overflow-hidden">{emailConfig.from_address}</small>;
+                                        return <small className="text-xs text-main-900 overflow-hidden ">{emailConfig.from_address}</small>;
                                     case "discord":
                                         const discordConfig = alerter.config as DiscordAlerter["config"];
-                                        return <small className="text-xs text-main-900 overflow-hidden">{discordConfig.channelName}</small>;
+                                        { discordConfig.channelName ? (
+                                            <small className="text-xs text-main-900 overflow-hidden">{discordConfig.channelName}</small>
+                                        ) : null }
                                     case "slack":
                                         const slackConfig = alerter.config as SlackAlerter["config"];
                                         return <small className="text-xs text-main-900 overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
                                     case "teams":
                                         const teamsConfig = alerter.config as TeamsAlerter["config"];
-                                        {alerter ? <small className="text-xs text-main-900 overflow-hidden">ddd</small> : null}
+                                        { alerter ? <small className="text-xs text-main-900 overflow-hidden">ddd</small> : null }
                                     default:
                                         return null;
                                 }
@@ -119,6 +123,7 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                     <Separator />
                 </React.Fragment>
             ))}
-        </>
+        </ScrollArea>
+        
     );
 }

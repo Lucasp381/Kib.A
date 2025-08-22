@@ -13,7 +13,11 @@ export async function GET(req: NextRequest) {
     try {
     const query = {
         index: KIBALERT_INDEX_PREFIX + '-alerters',
-        query : {}
+        size: 1000,
+        query: {
+
+        },
+        
     }
     if (type) {
         query.query = {

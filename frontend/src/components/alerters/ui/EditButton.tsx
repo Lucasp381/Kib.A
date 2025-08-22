@@ -33,6 +33,8 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                             .then((res) => res.json())  
                             .then((data) => {
                                 // delete the id to create a new one
+                                try {
+
                                 delete data.id;
                                 delete data.created_at;
                                 data.enabled = false; // Disable the duplicated alerter by default
@@ -52,6 +54,9 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
 
                                 }
 
+                                } catch (error) {
+                                    toast.error("Error duplicating alerter");
+                                }
                                 toast.success("Alerter duplicated successfully!");
                             })
                             
@@ -82,7 +87,11 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                         })
                                     }).then((res) => res.json()).then((data) => {
                                         // Handle the response from the API
-                                        toast.success("Test message sent successfully!");
+                                        if (!data.success) {
+                                            toast.error("Error sending test message: " + data.error);
+                                        } else {
+                                            toast.success("Test message sent successfully!");
+                                        }
                                     }).catch((error) => {
                                         toast.error("Error sending test message: " + error.message);
                                     });
@@ -106,7 +115,11 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                         })
                                     }).then((res) => res.json()).then((data) => {
                                         // Handle the response from the API
-                                        toast.success("Test message sent successfully!");
+                                        if (!data.success) {
+                                            toast.error("Error sending test message: " + data.error);
+                                        } else {
+                                            toast.success("Test message sent successfully!");
+                                        }
                                     }).catch((error) => {
                                         toast.error("Error sending test message: " + error.message);
                                     });
@@ -139,9 +152,11 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                     }).then((res) => res.json()).then((data) => {
                                         // Handle the response from the API
                                         if (!data.success) {
+                                            toast.error("Error sending test message: " + data.error);
                                             throw new Error(data.error || "Unknown error");
+                                        }else{
+                                            toast.success("Test message sent successfully!");
                                         }
-                                        toast.success("Test message sent successfully!");
                                     }).catch((error) => {
                                         toast.error("Error sending test message: " + error.message);
                                     });
@@ -169,9 +184,12 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                         }).then((res) => res.json()).then((data) => {
                                             // Handle the response from the API
                                             if (!data.success) {
+                                                toast.error("Error sending test message: " + data.error);
+
                                                 throw new Error(data.error || "Unknown error");
+                                            }else{
+                                                toast.success("Test message sent successfully!");
                                             }
-                                            toast.success("Test message sent successfully!");
                                         }).catch((error) => {
                                             toast.error("Error sending test message: " + error.message);
                                         });
