@@ -34,12 +34,9 @@ export async function GET(
 
     const data = await res.json();
     return NextResponse.json(data);
-    } catch (error) {
-    clearTimeout(timeout);
-    if ( error === 'AbortError') {
-      return NextResponse.json({ error: 'Request timed out' }, { status: 408 });
-    }
-    return NextResponse.json({ error: 'Error fetching Kibana status' }, { status: 500 });
+  } catch (error) {
+    console.error('Error fetching :', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 
   
