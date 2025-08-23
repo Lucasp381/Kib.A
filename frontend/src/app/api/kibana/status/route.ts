@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 5000);
 
 
 export async function GET(
   req: NextRequest
 
 ) {
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 5000);
 
   const kibanaUrl = process.env.KIBANA_URL || 'http://127.0.0.1:5601';
   const apiKey = process.env.ELASTIC_API_KEY;
