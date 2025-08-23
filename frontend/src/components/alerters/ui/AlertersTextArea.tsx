@@ -88,7 +88,7 @@ export default function AlertersTextArea({ id, placeholder,  onChange, onBlur , 
                     }
                 }}
                 >
-                {emojiMap[placeholder] || placeholder}
+                {placeholder}
                 </ContextMenuItem>
             ))}
         </ContextMenuSubContent>

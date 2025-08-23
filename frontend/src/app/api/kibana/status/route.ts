@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 5000);
 
 
 export async function GET(
@@ -20,8 +22,11 @@ export async function GET(
         'Authorization': `ApiKey ${apiKey}`,
         'kbn-xsrf': 'true',
       },
+    signal: controller.signal,
+
     });
 
+    clearTimeout(timeout);
     if (!res.ok) {
       console.error('Error fetching status:', res);
       return NextResponse.json({ error: 'Failed to fetch status' }, { status: 500 });
