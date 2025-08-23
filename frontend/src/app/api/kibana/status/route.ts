@@ -6,8 +6,8 @@ export async function GET(
   req: NextRequest
 
 ) {
-const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 5000);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
   const kibanaUrl = process.env.KIBANA_URL || 'http://127.0.0.1:5601';
   const apiKey = process.env.ELASTIC_API_KEY;
@@ -34,9 +34,12 @@ const timeout = setTimeout(() => controller.abort(), 5000);
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching :', error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    } catch (error) {
+    clearTimeout(timeout);
+    if ( error === 'AbortError') {
+      return NextResponse.json({ error: 'Request timed out' }, { status: 408 });
+    }
+    return NextResponse.json({ error: 'Error fetching Kibana status' }, { status: 500 });
   }
 
   
