@@ -38,61 +38,69 @@ export async function saveTeamsAlerter(
             created_at: data.created_at || new Date().toISOString(),
         }),
     })
-        .then((res) => {
+        .then(async (res) => {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            res.json().then((responseData) => {
+            await res.json().then((responseData) => {
                 if (!data.id) {
                     data.id = responseData.response._id; // Assuming the response contains the new ID
                     console.log(data);
                     if (setAlerters) {
-                        setAlerters((prevAlerters) => [...prevAlerters, data]);
+                        if (setAlerters) {
+                            setAlerters((prevAlerters) => {
+                                const safePrev = Array.isArray(prevAlerters) ? prevAlerters : [];
+                                return [...safePrev, data];
+                            });
+                        }
                     }
                     if (setEditAlerter) {
                         setEditAlerter(data);
                     }
                     toast.success("Teams alerter duplicated successfully!");
                     return responseData
-                }else {
-                    setAlerters((prevAlerters) => prevAlerters.map((alerter) => alerter.id === data.id ? data : alerter));
+                } else {
+                    setAlerters((prevAlerters) => {
+                        const safePrev = Array.isArray(prevAlerters) ? prevAlerters : [];
+                        return safePrev.map((alerter) => alerter.id === data.id ? data : alerter);
+                    });
                     toast.success("Alerter updated successfully!");
                     return responseData
                 }
 
             });
-           
+
         })
         .catch((err) => {
             console.error("Erreur lors de la mise à jour du Teams alerter :", err);
         })
-         .finally(() => {
+        .finally(() => {
         })
         ;
 
 }
 
-export async  function deleteTeamsAlerter(id: string, alerters : TeamsAlerter[], setAlerters: React.Dispatch<React.SetStateAction<TeamsAlerter[]>>, setEditAlerter?: React.Dispatch<React.SetStateAction<TeamsAlerter | null>>) {
-        if (!id) {
-            return;
-        }
-        if (!window.confirm("Are you sure you want to delete this Teams alerter?")) {
-            return;
-        }
-         await fetch(`/api/alerters?id=${id}`, {
-            method: "DELETE",
-        })
-            .then((res) => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                toast.success("Alerter deleted successfully!");
-             
-                setAlerters((prevAlerters) => prevAlerters.filter((alerter) => alerter.id !== id));
-                if (setEditAlerter) {
-                    setEditAlerter(alerters.length > 0 ? alerters[0] : null);
-                }
-                  
-                return res.json();
-            })
-            
-            .catch((err) => {
-                console.error("Erreur lors de la suppression du Teams alerter :", err);
-            });
+export async function deleteTeamsAlerter(id: string, alerters: TeamsAlerter[], setAlerters: React.Dispatch<React.SetStateAction<TeamsAlerter[]>>, setEditAlerter?: React.Dispatch<React.SetStateAction<TeamsAlerter | null>>) {
+    if (!id) {
+        return;
     }
+    if (!window.confirm("Are you sure you want to delete this Teams alerter?")) {
+        return;
+    }
+    await fetch(`/api/alerters?id=${id}`, {
+        method: "DELETE",
+    })
+        .then((res) => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            toast.success("Alerter deleted successfully!");
+
+            setAlerters((prevAlerters) => prevAlerters.filter((alerter) => alerter.id !== id));
+            if (setEditAlerter) {
+                setEditAlerter(alerters.length > 0 ? alerters[0] : null);
+            }
+
+            return res.json();
+        })
+
+        .catch((err) => {
+            console.error("Erreur lors de la suppression du Teams alerter :", err);
+        });
+}

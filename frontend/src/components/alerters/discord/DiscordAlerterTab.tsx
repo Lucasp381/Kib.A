@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Plus} from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -29,7 +29,6 @@ import { DiscordAlerter } from "@/types/alerters"; // Assurez-vous que ce type e
 import { Alerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import AlertersMenu from "@/components/alerters/ui/AlertersMenu";
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
-
 const type = "discord"; // Définir le type d'alerter
 
 export const FormSchema = z.object({
@@ -139,7 +138,7 @@ export default function DiscordAlerterTab({
         const data: DiscordAlerter = {
             name: "Discord",
             type: type,
-            
+
             description: "",
             config: {
 
@@ -158,7 +157,7 @@ export default function DiscordAlerterTab({
         saveDiscordAlerter(data, setAlerters, setEditAlerter);
 
         setLoading(false);
-        
+
 
     }
 
@@ -217,6 +216,7 @@ export default function DiscordAlerterTab({
 
     return (
         <>
+
             {alerters.length > 0 ? (
                 <Card className="flex w-full m-0 p-0 rounded-none border-none shadow-none ">
                     <div className="grid col-span-2 grid-cols-[auto_1fr] ">
@@ -224,35 +224,35 @@ export default function DiscordAlerterTab({
                         <Card className="fixed flex col-1 border-none shadow-none h-[calc(100vh-190px)] w-70">
                             <CardContent className="flex p-0 m-0">
                                 <div className="flex flex-col gap-2 w-full h-[calc(100vh-190px)]">
-                                <div className="flex flex-col gap-2 ">
-                                    <AlertersMenu
-                                        alerters={alerters}
-                                        editAlerter={editAlerter}
-                                        setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
-                                        addAlerter={addDiscordAlerter}
-                                        type={type}
-                                    />
-                                </div>
+                                    <div className="flex flex-col gap-2 ">
+                                        <AlertersMenu
+                                            alerters={alerters}
+                                            editAlerter={editAlerter}
+                                            setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
+                                            addAlerter={addDiscordAlerter}
+                                            type={type}
+                                        />
+                                    </div>
 
-                                <div className="flex flex-col items-center justify-center">
-                                    <Button
-                                        className="w-full max-w-[200px] mt-5 cursor-pointer"
-                                        variant="outline"
-                                        onClick={addDiscordAlerter}
-                                    >
-                                        <Plus className="mr-2" />
-                                        Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
-                                    </Button>
-                                </div>
+                                    <div className="flex flex-col items-center justify-center">
+                                        <Button
+                                            className="w-full max-w-[200px] mt-5 cursor-pointer"
+                                            variant="outline"
+                                            onClick={addDiscordAlerter}
+                                        >
+                                            <Plus className="mr-2" />
+                                            Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
+                                        </Button>
+                                    </div>
                                 </div>
                                 <div
-                            className="self-stretch w-[1px] mx-5 bg-gray-300 opacity-50"
-                            aria-hidden
-                        />
+                                    className="self-stretch w-[1px] mx-5 bg-gray-300 opacity-50"
+                                    aria-hidden
+                                />
                             </CardContent>
                         </Card>
 
-                   
+
 
 
                         {/* Formulaire */}
@@ -273,8 +273,8 @@ export default function DiscordAlerterTab({
                                             className="space-y-6 max-h-full w-full"
                                         >
                                             <div >
-                                                <EditButton 
-                                                    
+                                                <EditButton
+
                                                     setEditAlerter={setEditAlerter}
                                                     editAlerter={editAlerter}
                                                     loading={loading}
@@ -376,62 +376,66 @@ export default function DiscordAlerterTab({
 
                                                             )}
                                                         />
-                                                        <FormField
-                                                            control={form.control}
-                                                            name="config.channelId"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>Channel ID</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input
-                                                                            placeholder="123456789012345678"
-                                                                            autoComplete="false"
-                                                                            {...field}
-                                                                            onBlur={() => {
-                                                                                if (field.value) {
+                                                        <div className="grid grid-cols-2 gap-4">
 
-                                                                                    getDiscordChannelName(field.value, form.getValues("config.token"))
-                                                                                        .then((name) => {
-                                                                                            form.setValue("config.channelName", name, { shouldValidate: true });
-                                                                                            setChannelName(name);
-                                                                                            setEditAlerter(form.getValues() as DiscordAlerter);
-                                                                                        });
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                    </FormControl>
-                                                                    <FormDescription>
-                                                                        This is the ID of the Discord channel where alerts will be sent.
-                                                                    </FormDescription>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                        <FormField
-                                                            control={form.control}
-                                                            name="config.channelName"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>Channel name</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input
-                                                                            placeholder="123456789012345678"
-                                                                            autoComplete="false"
-                                                                            readOnly
-                                                                            disabled
+                                                            <FormField
+                                                                control={form.control}
+                                                                name="config.channelId"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Channel ID</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input
+                                                                                placeholder="123456789012345678"
+                                                                                autoComplete="false"
+                                                                                {...field}
+                                                                                onBlur={() => {
+                                                                                    if (field.value) {
 
-                                                                            {...field}
+                                                                                        getDiscordChannelName(field.value, form.getValues("config.token"))
+                                                                                            .then((name) => {
+                                                                                                form.setValue("config.channelName", name, { shouldValidate: true });
+                                                                                                setChannelName(name);
+                                                                                                setEditAlerter(form.getValues() as DiscordAlerter);
+                                                                                            });
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </FormControl>
+                                                                        <FormDescription>
+                                                                            This is the ID of the Discord channel where alerts will be sent.
+                                                                        </FormDescription>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={form.control}
+                                                                name="config.channelName"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Channel name</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input
+                                                                                placeholder="123456789012345678"
+                                                                                autoComplete="false"
+                                                                                readOnly
+                                                                                disabled
 
-                                                                            value={channelName || field.value}
-                                                                        />
-                                                                    </FormControl>
-                                                                    <FormDescription>
-                                                                        This is the ID of the Discord channel where alerts will be sent.
-                                                                    </FormDescription>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
+                                                                                {...field}
+
+                                                                                value={channelName || field.value}
+                                                                            />
+                                                                        </FormControl>
+                                                                        <FormDescription>
+                                                                            this will be automatically filled with channel name.
+                                                                        </FormDescription>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        
                                                         <FormField
                                                             control={form.control}
                                                             name="config.firedMessageTemplate"
@@ -463,7 +467,7 @@ export default function DiscordAlerterTab({
                                                                 <FormItem>
                                                                     <FormLabel>Recovered Message</FormLabel>
                                                                     <FormControl>
-                                                                    <AlertersTextArea
+                                                                        <AlertersTextArea
                                                                             id="recoveredMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
@@ -471,9 +475,9 @@ export default function DiscordAlerterTab({
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                    This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
-                                                                    Discord use Markdown syntax, so you can use **bold**, *italic*, `inline code`, and [links](https://example.com). <br />
-                                                                    See <a href="https://discord.com/developers/docs/reference#message-formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Discord formatting</a> for more details.
+                                                                        This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
+                                                                        Discord use Markdown syntax, so you can use **bold**, *italic*, `inline code`, and [links](https://example.com). <br />
+                                                                        See <a href="https://discord.com/developers/docs/reference#message-formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Discord formatting</a> for more details.
                                                                     </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>

@@ -78,6 +78,7 @@ export default function AlertersView() {
 
           {tabs.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="w-full">
+              
               {tab.value === activeTab ? (
                 (() => {
                   switch (tab.value) {

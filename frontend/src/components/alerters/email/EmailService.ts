@@ -45,14 +45,24 @@ export async function saveEmailAlerter(
                     data.id = responseData.response._id; // Assuming the response contains the new ID
                     console.log(data);
                     if (setAlerters) {
-                        setAlerters((prevAlerters) => [...prevAlerters, data]);
+                        if (setAlerters) {
+                            if (setAlerters) {
+                                setAlerters((prevAlerters) => {
+                                    const safePrev = Array.isArray(prevAlerters) ? prevAlerters : [];
+                                    return [...safePrev, data];
+                                });
+                            }
+                        }
                     }
                     if (setEditAlerter) {
                         setEditAlerter(data);
                     }
                     return responseData
                 } else {
-                    setAlerters((prevAlerters) => prevAlerters.map((alerter) => alerter.id === data.id ? data : alerter));
+                    setAlerters((prevAlerters) => {
+                        const safePrev = Array.isArray(prevAlerters) ? prevAlerters : [];
+                        return safePrev.map((alerter) => alerter.id === data.id ? data : alerter);
+                    });
                     toast.success("Alerter updated successfully!");
                     return responseData
                 }

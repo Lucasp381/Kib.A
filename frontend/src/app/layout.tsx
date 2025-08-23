@@ -1,25 +1,48 @@
 "use client";
-
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Switch } from "@/components/ui/switch";
-import { Home, Settings, Send  } from "lucide-react";
+import { Home, Settings, Send, Dot } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { MenuButton } from "@/components/menu/menuButton";
 import { ThemeProvider } from "next-themes";
 import { usePathname } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton"; // ajoute ça en haut
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: [
+    {
+      path: "../fonts/Geist/static/Geist-Medium.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Geist/static/Geist-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-geist-sans",
-  subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: [
+    {
+      path: "../fonts/Geist_Mono/static/GeistMono-Medium.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Geist_Mono/static/GeistMono-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 const menuItems = [
@@ -36,6 +59,52 @@ export default function RootLayout({
   const pathname = usePathname();
   const [dark, setDark] = useState(false);
   const [screenWidth, setScreenWidth] = useState(0);
+  const [esStatus, setEsStatus] = useState<{ status: string } | null>(null);
+  const [kibanaStatus, setKibanaStatus] = useState<{ status: { overall: { level: string } } } | null>(null);
+  useEffect(() => {
+    const fetchEsStatus = async () => {
+      try {
+        const response = await fetch("/api/elastic/status");
+        const data = await response.json();
+        console.log("Elasticsearch status:", data);
+        setEsStatus(data);
+        if (data.status) {
+
+          toast.success("Elasticsearch status fetched successfully");
+        } else {
+
+          toast.error("Error fetching Elasticsearch status");
+        }
+      } catch (error) {
+        toast.error("Error fetching Elasticsearch status");
+        console.error("Error fetching Elasticsearch status:", error);
+        setEsStatus(null);
+      }
+      console.log("e", esStatus)
+
+    };
+    const fetchKibanaStatus = async () => {
+      try {
+        const response = await fetch("/api/kibana/status");
+        const data = await response.json();
+        console.log("Kibana status:", data);
+        setKibanaStatus(data);
+        if (data.status) {
+          toast.success("Kibana status fetched successfully");
+        } else {
+          toast.error("Error fetching Kibana status");
+        }
+      } catch (error) {
+        toast.error("Error fetching Kibana status");
+        console.error("Error fetching Kibana status:", error);
+        setKibanaStatus(null);
+      }
+      console.log("k", kibanaStatus);
+    };
+    fetchKibanaStatus();
+    fetchEsStatus();
+
+  }, []);
 
   useEffect(() => {
     setScreenWidth(window.innerWidth);
@@ -64,52 +133,105 @@ export default function RootLayout({
             {/* Header en haut, sur toute la largeur */}
             <header className="sticky top-0 z-50 col-span-2 flex items-center justify-between bg-card border-b border-gray-200 dark:border-gray-700 p-4 shadow-md">
               {showLabel && (
-                <div className="inline items-center gap-2">
-                  <h1 className="font-extrabold text-4xl text-main-600 ml-20">
-                    Kib.<span className="text-red-600">A</span>
-                  </h1>
-                  <small className="flex ml-20 text-sm text-muted-foreground">
-                    Kibana Alert Management  
-                  </small>
-                </div>
+                <>
+                  <div className="inline items-center gap-2">
+                    <h1 className="font-extrabold text-4xl text-main-600 ml-20">
+                      Kib.<span className="text-red-600">A</span>
+                    </h1>
+                    <small className="flex ml-20 text-sm text-muted-foreground">
+                      Kibana Alert Management
+                    </small>
+                  </div>
+                  <div className=" gap-2">
+                    <div className="grid grid-cols-2 w-20 items-center">
+                      <small className="w-20 text-sm text-main-600 font-bold first-letter:text-red-600">Elastic</small>
+                      {esStatus ? (
+                        <span className=" flex items-center justify-center">
+                          {esStatus?.status === "green" ? (
+                            <div className=" bg-green-500 size-3 rounded-full border-1 m-0 p-0" />
+                          ) : esStatus?.status === "yellow" ? (
+                            <div className=" bg-yellow-500 size-3 rounded-full border-1 m-0 p-0" />
+                          ) : (
+                            <div className=" bg-red-500 size-3 rounded-full border-1 m-0 p-0" />
+                          )}
+                        </span>
+                      ) : (
+                        <span className=" flex items-center justify-center">
+                          <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 w-20 items-center ">
+                      <CardTitle className="text-sm font-bold text-main-600 first-letter:text-red-600">Kibana</CardTitle>
+                      {kibanaStatus ? (
+                        <span className="flex items-center justify-center">
+                          {kibanaStatus?.status?.overall?.level === "available" ? (
+                            <span className="bg-green-500  size-3 rounded-full border inline-block" />
+                          ) : kibanaStatus?.status?.overall?.level === "degraded" ? (
+                            <span className="bg-yellow-500 size-3 rounded-full border inline-block" />
+                          ) : (
+                            <span className="bg-red-500 size-3 rounded-full border inline-block" />
+                          )}
+                        </span>
+                      ) : (
+                        <span className=" flex items-center justify-center">
+                          <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
+                        </span>
+                      )}
+                    </div>
+
+                  </div>
+                </>
               )}
             </header>
 
-            {/* Ligne principale : menu + contenu */}
-            <div className="grid col-span-2 grid-cols-[auto_1fr] h-[calc(100vh-93px)]">
-              {/* Sidebar */}
-              <Card
-                className="border-none bg-card shadow-none flex flex-col col-1 justify-between "
-                style={{ width: menuWidth }}
-              >
-                <div className={"menu flex flex-col gap-1 " + (showLabel ? "items-start" : "items-center")}>
-                  {menuItems.map((item) => (
-                    <MenuButton
-                      key={item.href}
-                      href={item.href}
-                      icon={item.icon}
-                      active={pathname === item.href}
-                    >
-                      {showLabel && <span className="font-medium">{item.label}</span>}
-                    </MenuButton>
-                  ))}
-                </div>
-                <div className="mb-5 px-2">
-                  <div className="flex items-center gap-2 font-medium">
-                    <Switch id="switchTheme" onClick={toggleDarkMode} />
-                    <Label htmlFor="switchTheme">{dark ? "🌞" : "🌙"}</Label>
-                  </div>
-                </div>
+            {/* Si status kibana ou elastic red, on affiche rien */}
+            {esStatus === null || kibanaStatus === null ? (
+              // Skeleton si un service n'est pas encore chargé
+              <div className="w-screen h-screen flex flex-col items-center justify-center gap-4">
+                <Skeleton className="w-[80%] h-[50%] rounded-xl" />
+                <Skeleton className="w-[80%] h-80 rounded-xl" />
+              </div>
+            ) : esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available" ? (
+              // Bloc d'erreur si ES ou Kibana est indisponible
+              <Card className="w-screen border-0 shadow-none">
+                <p className="text-2xl text-muted-foreground text-center">
+                  Service unavailable, check Kibana or Elasticsearch configuration
+                </p>
               </Card>
+            ) : (
+              // Sinon, on affiche le contenu normal
+              <div className="grid col-span-2 grid-cols-[auto_1fr] h-[calc(100vh-93px)]">
+                {/* Sidebar + children */}
+                <Card
+                  className="border-none bg-card shadow-none flex flex-col col-1 justify-between "
+                  style={{ width: menuWidth }}
+                >
+                  <div className={"menu flex flex-col gap-1 " + (showLabel ? "items-start" : "items-center")}>
+                    {menuItems.map((item) => (
+                      <MenuButton key={item.href} href={item.href} icon={item.icon} active={pathname === item.href}>
+                        {showLabel && <span className="font-medium">{item.label}</span>}
+                      </MenuButton>
+                    ))}
+                  </div>
+                  <div className="mb-5 px-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Switch id="switchTheme" onClick={toggleDarkMode} />
+                      <Label htmlFor="switchTheme">{dark ? "🌞" : "🌙"}</Label>
+                    </div>
+                  </div>
+                </Card>
 
-              {/* Contenu principal */}
-              <main className="h-[calc(100vh-93px)] overflow-y-auto">
-                {children}
-                <Toaster richColors position="top-center" />
-              </main>
-            </div>
+                <main className="h-[calc(100vh-93px)] overflow-y-auto">
+                  {children}
+                  <Toaster richColors position="top-center" />
+                </main>
+              </div>
+            )}
+
+
+
           </div>
-
         </ThemeProvider>
       </body>
     </html>
