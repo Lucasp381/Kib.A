@@ -91,6 +91,11 @@ POST /_security/api_key
 
 ```
 change `"names": [ "kiba*" ],` with your custom index prefix
+Kib.A creates 4 index: 
+- {prefix}-variables
+- {prefix}-alerters
+- {prefix}-settings
+- {prefix}-history
 
 ### 3. Create `.env` files
 
