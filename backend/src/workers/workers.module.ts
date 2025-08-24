@@ -6,9 +6,10 @@ import { TeamsModule } from 'src/alerters/teams/teams.module';
 import { EmailModule } from 'src/alerters/email/email.module';
 import { CryptModule } from 'src/crypt/crypt.module'; // Import the CryptModule
 import { IndexModule } from 'src/elastic/index/index.module'; // Import the IndexModule
+import { TelegramModule } from 'src/alerters/telegram/telegram.module';
 
 @Module({
-  imports: [DiscordModule, SlackModule, TeamsModule, EmailModule, CryptModule, IndexModule], // ⚠️ ici
+  imports: [DiscordModule, SlackModule, TeamsModule, EmailModule, CryptModule, IndexModule, TelegramModule],
   providers: [WorkersService],
 })
 export class WorkersModule {}

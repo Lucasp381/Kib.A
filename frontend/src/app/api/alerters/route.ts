@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { estypes } from '@elastic/elasticsearch'
 import { esClient} from '@/lib/elasticsearch';
 import { encrypt, decrypt } from '@/lib/crypt';
-import { Alerter, EmailAlerter } from '@/types/alerters';
+import { Alerter, EmailAlerter, TelegramAlerter } from '@/types/alerters';
 const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kiba';
 
 export async function GET(req: NextRequest) {
@@ -84,6 +84,14 @@ export async function GET(req: NextRequest) {
                         source.config.password = await decrypt(source.config.password, process.env.ENCRYPTION_KEY);
                     }
                     break;
+                case 'telegram':
+                    const telegramSource = hit._source as TelegramAlerter;
+                    if (process.env.ENCRYPTION_KEY && telegramSource.config.token && telegramSource.config.token !== '') {
+                        telegramSource.config.token = await decrypt(telegramSource.config.token, process.env.ENCRYPTION_KEY);
+                    }
+                    if (process.env.ENCRYPTION_KEY && telegramSource.config.chatId && telegramSource.config.chatId !== '') {
+                        telegramSource.config.chatId = await decrypt(telegramSource.config.chatId, process.env.ENCRYPTION_KEY);
+                    }
                 default:
                     break;
             }
@@ -162,6 +170,14 @@ export async function POST(req: NextRequest) {
                 }
                 if (config.password) {
                         config.password = await encrypt(config.password, process.env.ENCRYPTION_KEY);
+                }
+                break;
+            case 'telegram':
+                if (config.token) {
+                    config.token = await encrypt(config.token, process.env.ENCRYPTION_KEY);
+                }
+                if (config.chatId) {
+                    config.chatId = await encrypt(config.chatId, process.env.ENCRYPTION_KEY);
                 }
                 break;
         }

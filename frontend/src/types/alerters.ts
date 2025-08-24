@@ -21,7 +21,7 @@ export interface WebhookConfigType {
     url: string;
 }
 
-export type Alerter =  SlackAlerter | DiscordAlerter | EmailAlerter | TeamsAlerter
+export type Alerter =  SlackAlerter | DiscordAlerter | EmailAlerter | TeamsAlerter | TelegramAlerter
 
 export type EmailAlerter = {
     id?: string;
@@ -86,6 +86,26 @@ export type SlackAlerter = {
     created_at?: string;
     updated_at?: string;
 };
+
+export type TelegramAlerter = {
+    id?: string;
+    name: string;
+    type: "telegram";
+    config: {
+        firedMessageTemplate?: string;
+        recoveredMessageTemplate?: string;
+        chatId: string;
+        token: string;
+    };
+    description?: string; // <- optionnel
+    all_rules?: boolean;
+    rules?: { id: string; name: string }[];
+    enabled?: boolean;
+    created_at?: string;
+    updated_at?: string;
+};
+
+        
 
 export type TeamsAlerter = {
     id?: string;

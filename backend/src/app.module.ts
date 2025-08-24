@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WorkersModule } from './workers/workers.module';
 import { TeamsModule } from './alerters/teams/teams.module';
+import { TelegramModule } from './alerters/telegram/telegram.module';
 import { VariablesModule } from './elastic/variables/variables.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -11,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
     isGlobal: true, // rend le module disponible dans toute l'application
     envFilePath: '.env', // chemin vers ton fichier .env
   }),
-  WorkersModule, TeamsModule, VariablesModule],
+  WorkersModule, TeamsModule, VariablesModule, TelegramModule],
   controllers: [AppController],
   providers: [AppService],
 })

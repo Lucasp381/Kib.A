@@ -6,8 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import {  deleteDiscordAlerter,  saveDiscordAlerter } from "@/components/alerters/discord/DiscordService"; // Assurez-vous que ces fonctions existent
 import { deleteSlackAlerter, saveSlackAlerter} from "@/components/alerters/slack/SlackService"; // Assurez-vous que cette fonction existe
 import { deleteEmailAlerter,  saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
-import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter, TeamsAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
+import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter, TeamsAlerter, TelegramAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import { deleteTeamsAlerter, saveTeamsAlerter } from "../teams/TeamsService";
+import { deleteTelegramAlerter, saveTelegramAlerter } from "../telegram/TelegramService";
 
 interface EditButtonProps<T extends Alerter> {
     editAlerter: T | null;
@@ -50,6 +51,9 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                         break;
                                     case "teams":
                                         saveTeamsAlerter(data, setAlerters as React.Dispatch<React.SetStateAction<TeamsAlerter[]>> , setEditAlerter as React.Dispatch<React.SetStateAction<TeamsAlerter | null>>);
+                                        break;
+                                    case "telegram":
+                                        saveTelegramAlerter(data, setAlerters as React.Dispatch<React.SetStateAction<TelegramAlerter[]>> , setEditAlerter as React.Dispatch<React.SetStateAction<TelegramAlerter | null>>);
                                         break;
 
                                 }
@@ -199,6 +203,38 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                                     }
 
                                     break;
+                                case "telegram":
+                                    const TelegramAlerter = editAlerter as TelegramAlerter;
+
+                                    if (TelegramAlerter && TelegramAlerter.config.token) {
+                                        console.log(`Sending test message to Telegram chat ID: ${TelegramAlerter.config.chatId}`);
+
+                                        await fetch("/api/alerters/telegram/send", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                chatId: TelegramAlerter.config.chatId,
+                                                token: TelegramAlerter.config.token,
+                                                message: "This is a test message from Kib.A. If you received this, it means your Telegram alerter is configured correctly!"
+                                            })
+                                        }).then((res) => res.json()).then((data) => {
+                                            // Handle the response from the API
+                                            if (!data.success) {
+                                                toast.error("Error sending test message: " + data.error);
+                                                throw new Error(data.error || "Unknown error");
+                                            }else{
+                                                toast.success("Test message sent successfully!");
+                                            }
+                                        }).catch((error) => {
+                                            toast.error("Error sending test message: " + error.message);
+                                        });
+
+                                    } else {
+                                        toast.error("Token or Chat ID is missing.");
+                                    }
+
                         }
                     }}
                     type="button"
@@ -223,6 +259,8 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                             case "teams":
                                 deleteTeamsAlerter(editAlerter?.id || "", alerters as TeamsAlerter[], setAlerters as React.Dispatch<React.SetStateAction<TeamsAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<TeamsAlerter | null>>);
                                 break;
+                            case "telegram":
+                                deleteTelegramAlerter(editAlerter?.id || "", alerters as TelegramAlerter[], setAlerters as React.Dispatch<React.SetStateAction<TelegramAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<TelegramAlerter | null>>);
                         }
 
                     }}

@@ -3,6 +3,7 @@ import { DiscordService } from 'src/alerters/discord/discord.service';
 import { SlackService } from 'src/alerters/slack/slack.service';
 import { TeamsService } from 'src/alerters/teams/teams.service';
 import { EmailService } from 'src/alerters/email/email.service';
+import { TelegramService } from 'src/alerters/telegram/telegram.service';
 import { CryptService } from 'src/crypt/crypt.service';
 import { IndexService } from 'src/elastic/index/index.service';
 interface Alerter {
@@ -41,6 +42,7 @@ export class WorkersService implements OnModuleInit {
     private readonly emailService: EmailService,
     private readonly cryptService: CryptService,
     private readonly indexService: IndexService,
+    private readonly telegramService: TelegramService,
   ) { }
 
   onModuleInit() {
@@ -130,6 +132,7 @@ export class WorkersService implements OnModuleInit {
           let subject = '';
           let token = '';
           let channelId = '';
+          let chatId = '';
           let username = '';
           let password = '';
           let isAdaptiveCard = false;
@@ -208,7 +211,18 @@ export class WorkersService implements OnModuleInit {
               );
               break;
             case 'telegram':
-              break;
+              
+              if (this.ENCRYPTION_KEY !== undefined) {
+                token = await this.cryptService.decrypt(alerter._source?.config.token, this.ENCRYPTION_KEY);
+                chatId = await this.cryptService.decrypt(alerter._source?.config.chatId, this.ENCRYPTION_KEY);
+              }
+              await this.telegramService.sendTelegramMessage(
+                token,
+                chatId,
+                message,
+                alert
+              );
+                break;
 
             default:
               this.logger.warn(`Alerter type ${alerter._source?.type} non géré`);

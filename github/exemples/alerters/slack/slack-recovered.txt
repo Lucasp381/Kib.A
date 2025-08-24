@@ -1,0 +1,6 @@
+*Recover* 🥳
+*TS*: {_source.@timestamp}
+*id*: {_id} 
+*Name*: {_source.kibana.alert.rule.name}
+*Reason*: `{_source.kibana.alert.reason}` 
+{_source.kibana.version}

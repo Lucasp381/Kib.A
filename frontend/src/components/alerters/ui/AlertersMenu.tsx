@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Dot } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter, TeamsAlerter } from "@/types/alerters";
+import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter, TeamsAlerter, TelegramAlerter } from "@/types/alerters";
 interface AlertersMenuProps<T extends Alerter> {
     alerters: T[];
     editAlerter: T | null;
@@ -110,6 +110,18 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                                 } mr-5 scale-500`}
                                         />
                                     )
+                                case "telegram":
+                                    const telegramConfig = alerter.config as TelegramAlerter["config"];
+                                    return (
+                                        <Dot
+                                            className={`${alerter.enabled && telegramConfig.token && telegramConfig.chatId
+                                                ? "text-green-500"
+                                                : !telegramConfig.token && !telegramConfig.chatId
+                                                    ? "text-yellow-500"
+                                                    : "text-gray-500"
+                                                } mr-5 scale-500`}
+                                        />
+                                            )
                                 default:
                                     return null;
                             }

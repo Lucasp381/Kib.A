@@ -15,6 +15,7 @@ import EmailAlerterTab from '@/components/alerters/email/EmailAlerterTab';
 import TeamsAlerterTab from '@/components/alerters/teams/TeamsAlerterTab';
 
 import { Alerter } from "@/types/alerters";
+import TelegramAlerterTab from '@/components/alerters/telegram/TelegramAlerterTab';
 const cardClass = "p-6 border-none border-gray-300 shadow-none rounded-none bg-herit";
 
 
@@ -114,7 +115,13 @@ export default function AlertersView() {
                         />
                       )
                     case "telegram":
-                      return <Card className='text-2xl text-center  h-[calc(100vh-190px)] flex items-center justify-center'><FontAwesomeIcon icon={faHelmetSafety} className='scale-300 text-main-500' />{tab.value.charAt(0).toUpperCase() + tab.value.slice(1)} alerter is not implemented yet.</Card>;
+                      return (
+                        <TelegramAlerterTab
+                          alerters={alerters}
+                          editAlerter={editAlerter}
+                          initialValues={editAlerter ?? undefined}
+                        />
+                      )
                     case "custom":
                       return <Card className='text-2xl text-center  h-[calc(100vh-190px)] flex items-center justify-center'><FontAwesomeIcon icon={faHelmetSafety} className='scale-300 text-main-500' />{tab.value.charAt(0).toUpperCase() + tab.value.slice(1)} alerter is not implemented yet.</Card>;
                     default:
