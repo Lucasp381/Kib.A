@@ -160,7 +160,8 @@ http://localhost:8080
 - [x] UI for managing alerters  
 - [x] Add Microsoft Teams integration  
 - [X] Dockerized deployment
-- [ ] Add Telegram & Custom alerters
+- [X] Add Telegram 
+- [ ] Add Custom alerters
 - [ ] Scheduled mute windows
 
 ---
