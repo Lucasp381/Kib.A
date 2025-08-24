@@ -39,8 +39,9 @@ export class TelegramService {
         throw new Error('Invalid Chat ID format');
       }
 
+      const encodedToken = encodeURIComponent(token);
 
-      const response = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      const response = await fetch("https://api.telegram.org/bot" + encodedToken + "/sendMessage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
