@@ -6,13 +6,25 @@ export class ElasticsearchService implements OnModuleInit {
   private client: Client;
 
   onModuleInit() {
-    this.client = new Client({
-        node: process.env.ELASTIC_URL || 'http://127.0.0.1:9200',
-        auth: {
-          apiKey: process.env.ELASTIC_API_KEY || ''
-      
-        },
-    });
+    let esClientConfiguration: {
+  node: string;
+  auth: { apiKey: string };
+  tls: { rejectUnauthorized: boolean };
+  caFingerprint?: string;
+} = {
+  node: process.env.ELASTIC_URL || 'http://127.0.0.1:9200',
+  auth: {
+    apiKey: process.env.ELASTIC_API_KEY || ''
+  },
+  tls: {
+    rejectUnauthorized: process.env.ELASTIC_TLS_REJECT_UNAUTHORIZED === 'true'
+  }
+};
+if (process.env.ELASTIC_CA_FINGERPRINT && process.env.ELASTIC_CA_FINGERPRINT.length > 0) {
+  esClientConfiguration.caFingerprint = process.env.ELASTIC_CA_FINGERPRINT;
+}
+
+    this.client = new Client(esClientConfiguration);
   }
 
   getClient(): Client {

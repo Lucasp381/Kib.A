@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { esClient } from '@/lib/elasticsearch';
+import { estypes } from '@elastic/elasticsearch';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const index = searchParams.get('index');
   const limit = parseInt(searchParams.get('limit') || '10', 10);
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const sort = searchParams.get('sort');
   const FieldMustExist = searchParams.get('FieldMustExist');
 
   if (!index) {
@@ -13,7 +15,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    let query
+    let query: estypes.QueryDslQueryContainer;
     if (FieldMustExist) {
       query = {
         bool: {
@@ -26,13 +28,16 @@ export async function GET(request: Request) {
     } else {
       query = { match_all: {} }
     }
+    
     const response = await esClient.search({
       index,
       from: (page - 1) * limit,
       size: limit,
       query,
+      sort: sort ? { [sort]: { order: 'desc' } } : { "@timestamp": { order: 'desc' } },
     });
     
+
     const totalHits =
       typeof response.hits.total === 'number' ? response.hits.total : response.hits.total?.value;
 

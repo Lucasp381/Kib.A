@@ -29,7 +29,7 @@ export class WorkersService implements OnModuleInit {
   private readonly logger = new Logger(WorkersService.name);
   private readonly INTERVAL = process.env.POLL_EVERY ? parseInt(process.env.POLL_EVERY) * 1000 : 10000; // 10 secondes
   private readonly ELASTIC_ALERTS_INDEX = process.env.ELASTIC_ALERTS_INDEX || '*alerts-*';
-  private readonly ELASTIC_ALERTERS_INDEX_NAME = process.env.KIBALERT_INDEX_PREFIX + '-alerters';
+  private readonly ELASTIC_ALERTERS_INDEX_NAME = process.env.KIBA_INDEX_PREFIX + '-alerters';
   private readonly FRONTEND_NODE = process.env.FRONTEND_NODE || 'http://frontend:3000';
   private readonly ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || undefined; // Clé de chiffrement par défaut
   private notifiedAlerts = new Set<string>();

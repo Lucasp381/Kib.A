@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { esClient, getKeyValue, setKeyValue } from '@/lib/elasticsearch';
 import { estypes } from '@elastic/elasticsearch'
 
-const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kiba';
+const KIBA_INDEX_PREFIX = process.env.KIBA_INDEX_PREFIX || 'kiba';
 type Variable = {
     id: string;
     data: string;
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     if (!key) {
         const document = await esClient.search({
-            index: KIBALERT_INDEX_PREFIX + '-variables',
+            index: KIBA_INDEX_PREFIX + '-variables',
             query: {              
                     match_all: {}
             }
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(data);
     }
     try {
-        const document = await getKeyValue(KIBALERT_INDEX_PREFIX + '-variables', key);
+        const document = await getKeyValue(KIBA_INDEX_PREFIX + '-variables', key);
         if (!document) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing key or value parameter' }, { status: 400 });
     }
     try {
-        await setKeyValue(KIBALERT_INDEX_PREFIX + '-variables', key, JSON.stringify({data: value, "@timestamp": new Date().toISOString()}));
+        await setKeyValue(KIBA_INDEX_PREFIX + '-variables', key, JSON.stringify({data: value, "@timestamp": new Date().toISOString()}));
         return NextResponse.json({ message: 'Document created/updated successfully' });
     } catch (error) {
         console.error('Error creating/updating document:', error);
@@ -73,7 +73,7 @@ export async function DELETE(req: NextRequest) {
     }
     try {
         const response = await esClient.delete({
-            index: KIBALERT_INDEX_PREFIX + '-variables',
+            index: KIBA_INDEX_PREFIX + '-variables',
             id: key,
         });
         return NextResponse.json({ message: 'Document deleted successfully', response });

@@ -3,7 +3,7 @@ import { estypes } from '@elastic/elasticsearch'
 import { esClient} from '@/lib/elasticsearch';
 import { encrypt, decrypt } from '@/lib/crypt';
 import { Alerter, EmailAlerter, TelegramAlerter } from '@/types/alerters';
-const KIBALERT_INDEX_PREFIX = process.env.KIBALERT_INDEX_PREFIX || 'kiba';
+const KIBA_INDEX_PREFIX = process.env.KIBA_INDEX_PREFIX || 'kiba';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const id = searchParams.get('id');
     try {
     const query = {
-        index: KIBALERT_INDEX_PREFIX + '-alerters',
+        index: KIBA_INDEX_PREFIX + '-alerters',
         size: 1000,
         query: {
 
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
         }
     }
     const query = {
-        index: KIBALERT_INDEX_PREFIX + '-alerters',
+        index: KIBA_INDEX_PREFIX + '-alerters',
         id : id || undefined, // si id est fourni, on l'utilise, sinon on laisse undefined pour créer un nouveau document
         document: {
             name: decodeURIComponent(name),
@@ -222,7 +222,7 @@ export async function DELETE(req: NextRequest) {
     }
     try {
         const response = await esClient.delete({
-            index: KIBALERT_INDEX_PREFIX + '-alerters',
+            index: KIBA_INDEX_PREFIX + '-alerters',
             id: id,
         });
 

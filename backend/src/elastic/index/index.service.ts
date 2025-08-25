@@ -36,7 +36,6 @@ export class IndexService {
     return res.hits.hits;
 
 
-    return `This action returns all index`;
   }
 
   findOne(id: number) {

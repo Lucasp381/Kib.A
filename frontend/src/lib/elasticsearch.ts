@@ -1,12 +1,24 @@
 import { Client, estypes } from '@elastic/elasticsearch';
 
-export const esClient = new Client({
+let esClientConfiguration: {
+  node: string;
+  auth: { apiKey: string };
+  tls: { rejectUnauthorized: boolean };
+  caFingerprint?: string;
+} = {
   node: process.env.ELASTIC_URL || 'http://127.0.0.1:9200',
   auth: {
     apiKey: process.env.ELASTIC_API_KEY || ''
-
+  },
+  tls: {
+    rejectUnauthorized: process.env.ELASTIC_TLS_REJECT_UNAUTHORIZED === 'true'
   }
-})
+};
+if (process.env.ELASTIC_CA_FINGERPRINT && process.env.ELASTIC_CA_FINGERPRINT.length > 0) {
+  esClientConfiguration.caFingerprint = process.env.ELASTIC_CA_FINGERPRINT;
+}
+
+export const esClient = new Client(esClientConfiguration);
 
 export async function checkESConnection() {
   try {
@@ -20,16 +32,16 @@ export async function checkESConnection() {
 }
 
 export async function createIndex(indexName: string) {
-try {
+  try {
     const response = await esClient.indices.create({ index: indexName });
     console.log(`Index ${indexName} created successfully:`, response);
 
     return true;
   } catch (error) {
-   
-       console.error(`Failed to create index:`, error);
-      return false;
-   
+
+    console.error(`Failed to create index:`, error);
+    return false;
+
   }
 }
 
@@ -65,9 +77,9 @@ export async function search(
     return null;
   }
 }
-export async function deleteIndex(indexName : string) {  
+export async function deleteIndex(indexName: string) {
   try {
-    const response = await esClient.indices.delete({ index: indexName }); 
+    const response = await esClient.indices.delete({ index: indexName });
     console.log(`Index ${indexName} deleted successfully:`, response);
     return true;
   } catch (error) {
@@ -116,7 +128,7 @@ export async function getKeyValue(indexName: string, id: string) {
 export async function setKeyValue(indexName: string, id: string, value: string) {
   try {
     // Toujours indexer un objet avec les champs data et @timestamp
-    const doc: { data: string; "@timestamp"?: string } = 
+    const doc: { data: string; "@timestamp"?: string } =
       typeof value === "object" && value !== null ? value : { data: value };
     // Ajoute le timestamp automatiquement
     doc["@timestamp"] = new Date().toISOString();
