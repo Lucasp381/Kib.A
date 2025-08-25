@@ -49,6 +49,54 @@ cd kib.A
 curl -fsSL https://elastic.co/start-local | sh
 ```
 
+Create API Key with enought privileges : 
+
+Dev Tools:
+```
+POST /_security/api_key
+{
+  "name": "read-only-key",
+  "role_descriptors": {
+    "read-only-role": {
+      "cluster": [
+        "monitor"
+      ],
+      "indices": [
+        {
+          "names": [ "*alerts*" ],
+          "privileges": [ "read" ],
+          "allow_restricted_indices": false
+        },
+        {
+          "names": [ "kiba*" ],
+          "privileges": [ "all" ],
+          "allow_restricted_indices": false
+        }
+      ],
+      "applications": [
+        {
+          "application": "kibana-.kibana",
+          "privileges": [ "read" ],
+          "resources": [ "space:default" ]
+        }
+      ],
+      "run_as": [],
+      "metadata": {},
+      "transient_metadata": {
+        "enabled": true
+      }
+    }
+  }
+}
+
+```
+change `"names": [ "kiba*" ],` with your custom index prefix
+Kib.A creates 4 index: 
+- {prefix}-variables
+- {prefix}-alerters
+- {prefix}-settings
+- {prefix}-history
+
 ### 3. Create `.env` files
 
 #### 📂 .env
@@ -112,7 +160,8 @@ http://localhost:8080
 - [x] UI for managing alerters  
 - [x] Add Microsoft Teams integration  
 - [X] Dockerized deployment
-- [ ] Add Telegram & Custom alerters
+- [X] Add Telegram 
+- [ ] Add Custom alerters
 - [ ] Scheduled mute windows
 
 ---
