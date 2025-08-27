@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 
 export async function checkEmailAlerterExists(name: string): Promise<boolean> {
-    return fetch(`/api/alerters?name=${name}`)
+    return fetch(`/api/backend/alerters?name=${name}`)
         .then((res) => {
             if (!res.ok) {
                 throw new Error(`Failed to check alerter existence: ${res.statusText}`);
@@ -26,7 +26,7 @@ export async function saveEmailAlerter(
 ) {
 
 
-    await fetch("/api/alerters", {
+    await fetch("/api/backend/alerters", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export async function deleteEmailAlerter(id: string, alerters: EmailAlerter[], s
     if (!window.confirm("Are you sure you want to delete this Email alerter?")) {
         return;
     }
-    fetch(`/api/alerters?id=${id}`, {
+    fetch(`/api/backend/alerters?id=${id}`, {
         method: "DELETE",
     })
         .then((res) => {

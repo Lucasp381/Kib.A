@@ -25,6 +25,7 @@ export default  function AlertsTable({ pageSize = 15 }: AlertsTableProps) {
 
   const fetchAlerts = async (page: number) => {
     await get('KIBANA_URL').then((response) => {
+      console.log("KIBANA_URL", response);
       if (response.ok && response.value) {
         setKIBANA_URL(response.value);
       }

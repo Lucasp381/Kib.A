@@ -58,7 +58,7 @@ export class TelegramService {
         throw new Error(`Telegram API error: ${errorData.description || response.statusText}`);
       }
       this.logger.log(`Message sent to Telegram chat ID ${chatId} successfully.`);
-      return response;
+      return {success: true, response};
     } catch (err) {
       this.logger.error(`Failed to send Telegram message: ${err.message}`);
       throw new HttpException(`Failed to send Telegram message: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);

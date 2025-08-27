@@ -1,9 +1,9 @@
 // EmailAlerterTab.tsx
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-import { toast} from "sonner";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -21,13 +21,13 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import {  saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
+import { saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
 import { Card, CardContent } from "@/components/ui/card"
 import EditButton from "@/components/alerters/ui/EditButton"; // Assurez-vous que ce composant existe
-import { EmailAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import { Alerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import AlertersMenu from "@/components/alerters/ui/AlertersMenu"; // Assurez-vous que ce composant existe
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea"; // Assurez-vous que ce composant existe
+import { saveAlerter, SetAndGetAlerters } from "@/lib/alerters";
 
 const type = "email"; // Définir le type d'alerter
 
@@ -41,12 +41,12 @@ export const FormSchema = z.object({
     "description": z.string().optional(),
     "type": z.literal(type),
     "config": z.object({
-        "smtp_server": z.string(),
-        "port": z.number(),
-        "username": z.string(),
-        "password": z.string(),
-        "from_address": z.string(),
-        "to_addresses": z.string(),
+        "smtp_server": z.string().min(1, { message: "SMTP server is required." }),
+        "port": z.number().min(1, { message: "Port must be a positive number." }),
+        "username": z.string().min(1, { message: "Username is required." }),
+        "password": z.string().min(1, { message: "Password is required." }),
+        "from_address": z.string().min(1, { message: "From address is required." }),
+        "to_addresses": z.string().min(1, { message: "To addresses are required." }),
         "cc_addresses": z.string().optional(),
         "firedSubjectTemplate": z.string().optional(),
         "recoveredSubjectTemplate": z.string().optional(),
@@ -67,196 +67,162 @@ export const FormSchema = z.object({
 
 
 
+export default function EmailAlerterTab() {
 
-interface EmailTabProps {
-    alerters: Alerter[] | undefined[];
-    editAlerter: Alerter | null;
-    initialValues?: Alerter | null;
-}
-
-export default function EmailAlerterTab({
-
-    initialValues
-}: EmailTabProps) {
-
-    const [alerters, setAlerters] = useState<EmailAlerter[]>([]);
-    const [editAlerter, setEditAlerter] = useState<EmailAlerter | null>(null);
+    const [alerters, setAlerters] = useState<Alerter[]>([]);
+    const [editAlerter, setEditAlerter] = useState<Alerter | null>(null);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
     const [allChecked, setAllChecked] = useState(false);
-    const [channelName, setChannelName] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-
+    const data: Alerter = {
+        id: "",
+        name: "Email",
+        type: type,
+        description: "",
+        config: {
+            smtp_server: "",
+            port: 465,
+            username: "",
+            password: "",
+            from_address: "",
+            to_addresses: "",
+            cc_addresses: "",
+            firedMessageTemplate: "",
+            recoveredMessageTemplate: "",
+            firedSubjectTemplate: "",
+            recoveredSubjectTemplate: "",
+        },
+        enabled: false, // Disable by default
+        all_rules: true,
+        rules: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    }
     type AlerterFormData = z.infer<typeof FormSchema>;
     const form = useForm<AlerterFormData>({
         resolver: zodResolver(FormSchema),
-        defaultValues: initialValues?.type === type ? initialValues : {
-            id: "",
-            name: "Email",
-            type: type,
-            description: "",
-            config: {
-                smtp_server: "",
-                port: 587,
-                username: "",
-                password: "",
-                from_address: "",
-                to_addresses: "",
-                cc_addresses: "",
-                firedMessageTemplate: "",
-                recoveredMessageTemplate: "",
-                firedSubjectTemplate: "",
-                recoveredSubjectTemplate: "",
-            },
-            enabled: false, // Disable by default
-            all_rules: true,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        },
+        defaultValues: data
     })
 
-    function addEmailAlerter() {
+    async function addAlerter(data: Alerter) {
         setLoading(true);
-        const data: EmailAlerter = {
-           
-            name: "Email",
-            type: type,
-            description: "",
-            config: {
-                smtp_server: "",
-                port: 587,
-                username: "",
-                password: "",
-                from_address: "",
-                to_addresses: "",
-                cc_addresses: "",
-                firedMessageTemplate: "",
-                recoveredMessageTemplate: "",
-                firedSubjectTemplate: "",
-                recoveredSubjectTemplate: "",
-            },
-            enabled: false, // Disable by default
-            all_rules: true,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-        saveEmailAlerter(data, setAlerters, setEditAlerter);
 
+        await saveAlerter(data);
 
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+
+        setAlerters(list);
+        setEditAlerter(list[list.length - 1] ?? null);
 
         setLoading(false);
-
     }
 
+    async function fetchAlerters() {
+        setLoading(true);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+        setAlerters(list);
+        setEditAlerter(list[0] ?? null);
+        setLoading(false);
+    }
 
     useEffect(() => {
-        fetch(`/api/alerters?type=${type}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setAlerters(data);
-                if (data.length === 0) {
-                    toast.info("No alerters found. Please add a new alerter.");
-                }
-                // ✅ sélectionne automatiquement le 1er alerter du tab
-                setEditAlerter(data[0] ?? null);
-            });
-    }, []);
-    useEffect(() => {
+        setLoading(true);
+        fetchAlerters();
         setLoading(false);
-        if (initialValues) {
-            if (initialValues?.type === type) {
-                form.reset(initialValues);
-            }
-        }
-    }, [initialValues]);
+    }, []);
+
+
+
     useEffect(() => {
         fetch("/api/kibana/rules?limit=10000")
             .then((res) => res.json())
             .then((data) => {
                 setRules(data.data);
-
-
             });
     }, []);
 
     useEffect(() => {
-
         if (editAlerter) {
-
             if (editAlerter?.type === type) {
                 form.reset(editAlerter);
-
             }
         }
     }, [editAlerter]);
 
 
-
     return (
         <>
-                    {alerters.length > 0 ? (
-                        <Card className="flex w-full m-0 p-0 rounded-none border-none shadow-none ">
-                            <div className="grid col-span-2 grid-cols-[auto_1fr] ">
-                                {/* Liste des alerters */}
-                                <Card className="fixed flex col-1 border-none shadow-none h-[calc(100vh-190px)] w-70">
-                                    <CardContent className="flex p-0 m-0">
-                                        <div className="flex flex-col gap-2 w-full h-[calc(100vh-190px)]">
-                                        <div className="flex flex-col gap-2 ">
-                                            <AlertersMenu
-                                                alerters={alerters}
-                                                editAlerter={editAlerter}
-                                                setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
-                                                addAlerter={addEmailAlerter}
-                                                type={type}
-                                            />
-                                        </div>
-        
-                                        <div className="flex flex-col items-center justify-center">
-                                            <Button
-                                                className="w-full max-w-[200px] mt-5 cursor-pointer"
-                                                variant="outline"
-                                                onClick={addEmailAlerter}
-                                            >
-                                                <Plus className="mr-2" />
-                                                Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
-                                            </Button>
-                                        </div>
-                                        </div>
-                                        <div
+            {alerters.length > 0 ? (
+                <Card className="flex w-full m-0 p-0 rounded-none border-none shadow-none ">
+                    <div className="grid col-span-2 grid-cols-[auto_1fr] ">
+                        {/* Liste des alerters */}
+                        <Card className="fixed flex col-1 border-none shadow-none h-[calc(100vh-190px)] w-70">
+                            <CardContent className="flex p-0 m-0">
+                                <div className="flex flex-col gap-2 w-full h-[calc(100vh-190px)]">
+                                    <div className="flex flex-col gap-2 ">
+                                        <AlertersMenu
+                                            alerters={alerters}
+                                            editAlerter={editAlerter}
+                                            setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
+                                            type={type}
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col items-center justify-center">
+                                        <Button
+                                            className="w-full max-w-[200px] mt-5 cursor-pointer"
+                                            variant="outline"
+                                            onClick={() => addAlerter(data)}
+                                        >
+                                            <Plus className="mr-2" />
+                                            Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div
                                     className="self-stretch w-[1px] mx-5 bg-gray-300 opacity-50"
                                     aria-hidden
                                 />
-                                    </CardContent>
-                                </Card>
-        
-                           
-        
-        
-                                {/* Formulaire */}
-                                <Card
-                                    className={`col-2  ml-70 overflow-y-auto border-none shadow-none h-[calc(100vh-190px)] ${editAlerter ? "p-0" : "p-6"}`}
-                                >
-                                    <CardContent>
-        
-                                        <div >
-        
-                                            <Form {...form}   >
-                                        <form
-                                            onSubmit={form.handleSubmit((data) => {
-                                                saveEmailAlerter(data, setAlerters);
+                            </CardContent>
+                        </Card>
 
+
+
+
+                        {/* Formulaire */}
+                        <Card
+                            className={`col-2  ml-70 overflow-y-auto border-none shadow-none h-[calc(100vh-190px)] ${editAlerter ? "p-0" : "p-6"}`}
+                        >
+                            <CardContent>
+
+                                <div >
+
+                                    <Form {...form}   >
+                                        <form
+                                            onSubmit={form.handleSubmit(async (data) => {
+                                                try {
+                                                    await saveAlerter(data);
+                                                    await SetAndGetAlerters(type, setAlerters);
+                                                    toast.success("Alerter saved successfully");
+                                                } catch (error) {
+                                                    toast.error("Error saving alerter: " + error);
+                                                }
                                             })}
+                                            onChange={() => {
+                                                setEditAlerter(form.getValues());
+                                            }}
                                             className="space-y-6 max-h-full w-full"
                                         >
                                             <div>
                                                 <EditButton
 
                                                     editAlerter={editAlerter}
+                                                    setAlerters={setAlerters}
                                                     setEditAlerter={setEditAlerter}
                                                     loading={loading}
                                                     alerters={alerters}
-                                                    setAlerters={setAlerters}
                                                     type={type}
                                                 />
 
@@ -361,7 +327,7 @@ export default function EmailAlerterTab({
                                                                     <FormLabel>Port</FormLabel>
                                                                     <FormControl>
                                                                         <Input
-                                                                            placeholder="123456789012345678"
+                                                                            placeholder="465"
                                                                             autoComplete="false"
                                                                             type="number"
                                                                             {...field}
@@ -385,13 +351,13 @@ export default function EmailAlerterTab({
                                                                     <FormLabel>Username</FormLabel>
                                                                     <FormControl>
                                                                         <Input
-                                                                            placeholder="123456789012345678"
+                                                                            placeholder="User"
                                                                             autoComplete="false"
 
 
                                                                             {...field}
 
-                                                                            value={channelName || field.value}
+                                                                            value={field.value}
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
@@ -485,7 +451,7 @@ export default function EmailAlerterTab({
 
                                                                             {...field}
 
-                                                                            value={channelName || field.value}
+                                                                            value={field.value}
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
@@ -503,13 +469,13 @@ export default function EmailAlerterTab({
                                                                     <FormLabel>Fired subject</FormLabel>
                                                                     <FormControl>
                                                                         <Input
-                                                                            placeholder="e.g [KibAlbert] Alert Fired: {_source.kibana.alert.rule.name}"
+                                                                            placeholder="e.g [Kib.A] Alert Fired: {_source.kibana.alert.rule.name}"
                                                                             autoComplete="false"
 
 
                                                                             {...field}
 
-                                                                            value={channelName || field.value}
+                                                                            value={field.value}
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
@@ -526,7 +492,7 @@ export default function EmailAlerterTab({
                                                                 <FormItem>
                                                                     <FormLabel>Fired Message</FormLabel>
                                                                     <FormControl>
-                                                                    <AlertersTextArea
+                                                                        <AlertersTextArea
                                                                             id="firedMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
@@ -534,7 +500,7 @@ export default function EmailAlerterTab({
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                            This is the HTML message template for alerts. Use Right click to insert Emoji or Placeholders.
+                                                                        This is the HTML message template for alerts. Use Right click to insert Emoji or Placeholders.
                                                                     </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -548,17 +514,17 @@ export default function EmailAlerterTab({
                                                                     <FormLabel>Recovered subject</FormLabel>
                                                                     <FormControl>
                                                                         <Input
-                                                                            placeholder="e.g [KibAlbert] Alert Fired: {_source.kibana.alert.rule.name}"
+                                                                            placeholder="e.g [Kib.A] Alert Fired: {_source.kibana.alert.rule.name}"
                                                                             autoComplete="false"
 
 
                                                                             {...field}
 
-                                                                            value={channelName || field.value}
+                                                                            value={field.value}
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                    This is the HTML message template for alerts. Use Right click to insert Emoji or Placeholders.
+                                                                        This is the HTML message template for alerts. Use Right click to insert Emoji or Placeholders.
                                                                     </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -571,7 +537,7 @@ export default function EmailAlerterTab({
                                                                 <FormItem>
                                                                     <FormLabel>Recovered Message</FormLabel>
                                                                     <FormControl>
-                                                                    <AlertersTextArea
+                                                                        <AlertersTextArea
                                                                             id="recoveredMessageTemplate"
                                                                             value={field.value}       // controlled
                                                                             onChange={field.onChange} // propagate correctly
@@ -680,7 +646,7 @@ export default function EmailAlerterTab({
                     </div>
                 </Card>
             ) : (
-                <Button className="max-w-[200px] mt-5" variant="outline" onClick={addEmailAlerter} >
+                <Button className="max-w-[200px] mt-5" variant="outline" onClick={() => addAlerter(data)} >
                     <Plus className="mr-2" />
                     Add Email Alerter
                 </Button>

@@ -56,7 +56,6 @@ export class WorkersService implements OnModuleInit {
     try {
       this.logger.debug("👉 polling alerts...");
 
-      //const alertsRes = await fetch(`${this.FRONTEND_NODE}/api/elastic/index?index=${this.ELASTIC_ALERTS_INDEX}`);
       const alerts = await this.indexService.findAllDocuments(this.ELASTIC_ALERTS_INDEX);
 
       this.logger.debug("✅ fetch done");
@@ -139,10 +138,10 @@ export class WorkersService implements OnModuleInit {
 
           if (status === 'active' || status === 'flapping') {
             message = alerter._source?.config.firedMessageTemplate || `🚨 Alert fired: ${alert._source['kibana.alert.rule.name'] || ruleId}`;
-            subject = alerter._source?.config.firedSubjectTemplate || '[Kibalbert] Alert Notification';
+            subject = alerter._source?.config.firedSubjectTemplate || '[Kib.A] Alert Notification';
           } else {
             message = alerter._source?.config.recoveredMessageTemplate || `✅ Alert recovered: ${alert._source['kibana.alert.rule.name'] || ruleId}`;
-            subject = alerter._source?.config.recoveredSubjectTemplate || '[Kibalbert] Alert Notification';
+            subject = alerter._source?.config.recoveredSubjectTemplate || '[Kib.A] Alert Notification';
           }
 
           switch (alerter._source?.type) {
@@ -205,7 +204,7 @@ export class WorkersService implements OnModuleInit {
                 alerter._source?.config.from_address,
                 alerter._source?.config.to_addresses.split(",").map((addr: string) => addr.trim()),
                 alerter._source?.config.cc_addresses ? alerter._source?.config.cc_addresses.split(",").map((addr: string) => addr.trim()) : [],
-                alerter._source?.config.subject || '[Kibalbert] Notification',
+                alerter._source?.config.subject || '[Kib.A] Notification',
                 message,
                 alert
               );

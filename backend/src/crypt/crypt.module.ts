@@ -4,6 +4,6 @@ import { CryptService } from './crypt.service';
 
 @Module({
   providers: [CryptService],
-  exports: [CryptService], // <- essentiel pour que d'autres modules puissent l'utiliser
+  exports: [CryptService], 
 })
 export class CryptModule {}

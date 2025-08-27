@@ -1,9 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
+
 
 @Injectable()
 export class ElasticsearchService implements OnModuleInit {
   private client: Client;
+  private readonly logger = new Logger(ElasticsearchService.name);
 
   onModuleInit() {
     let esClientConfiguration: {
@@ -31,23 +33,43 @@ if (process.env.ELASTIC_CA_FINGERPRINT && process.env.ELASTIC_CA_FINGERPRINT.len
     return this.client;
   }
 
-  async index(index: string, body: any) {
-    return this.client.index({
-      index,
-      body,
-    });
+  async index( index: string, body: any, id?: string,) {
+      type indexResult = {
+        _id: string;
+        _index: string;
+        _version: number;
+        result: string;
+      };
+    try {
+
+      const result = await this.client.index({
+        id: id || undefined,
+        index,
+        body,
+        refresh: true, // Ensure the document is searchable immediately
+      });
+      this.logger.log(`Indexed document with id: ${JSON.stringify(result)} in index: ${index}`);
+      return result as indexResult;
+
+    } catch (error) {
+      this.logger.error(`Error indexing document in index: ${index}`, error);
+      return null;
+    }
   }
 
-  async search(index: string, query: any) {
+  async search(index: string, query: any, sort?: any) {
     return this.client.search({
       index,
+      sort: sort,
       body: query,
     });
   }
     async delete(index: string, id: string) {
+      this.logger.log(`Deleting document with id: ${id} from index: ${index}`);
         return this.client.delete({
         index,
         id,
+        refresh: true, // Ensure the document is searchable immediately
         });
     }
 }

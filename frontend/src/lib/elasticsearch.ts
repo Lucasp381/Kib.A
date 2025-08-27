@@ -1,6 +1,6 @@
 import { Client, estypes } from '@elastic/elasticsearch';
 
-let esClientConfiguration: {
+const esClientConfiguration: {
   node: string;
   auth: { apiKey: string };
   tls: { rejectUnauthorized: boolean };

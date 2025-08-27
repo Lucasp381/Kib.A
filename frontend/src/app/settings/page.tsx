@@ -12,7 +12,7 @@ import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
 const cardClass = "p-6 border-none border-gray-300 shadow-none rounded-none bg-herit";
 
 function VariablesTable() {
-  const [variables, setVariables] = useState<{ id: string; data: string; timestamp: string }[]>([]);
+  const [variables, setVariables] = useState<{_index: string, _id: string, _score: number, _source: { data: string, "@timestamp": string }}[]>([]);
   const [editValues, setEditValues] = useState<{ [id: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -27,11 +27,12 @@ function VariablesTable() {
   const fetchVariables = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/internal/variables");
+      const res = await fetch("/api/backend/elastic/variables");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      const filteredData = data.filter((v: { id: string }) => !v.id.startsWith("internal."));
+      const filteredData = data.filter((v: { _id: string }) => !v._id.startsWith("internal."));
       setVariables(filteredData);
+      console.log("Variables loaded", filteredData);
     } catch (err) {
       console.error("Error fetching variables", err);
       toast.error("Impossible de charger les variables");
@@ -105,8 +106,8 @@ function VariablesTable() {
   // Filtrage selon recherche
   const filteredVariables = variables.filter(
     v =>
-      v.id.toLowerCase().includes(search.toLowerCase()) ||
-      String(v.data).toLowerCase().includes(search.toLowerCase())
+      v._id.toLowerCase().includes(search.toLowerCase()) ||
+      String(v._source.data).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -154,24 +155,24 @@ function VariablesTable() {
         </TableHeader>
         <TableBody>
           {filteredVariables && filteredVariables
-            .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+            .sort((a, b) => b._source["@timestamp"].localeCompare(a._source["@timestamp"]))
             .map(variable => (
-              <TableRow key={variable.id}>
-                <TableCell>{variable.id}</TableCell>
+              <TableRow key={variable._id}>
+                <TableCell>{variable._id}</TableCell>
                 <TableCell>
                   <input
-                    value={editValues[variable.id] ?? variable.data}
-                    onChange={e => handleChange(variable.id, e.target.value)}
+                    value={editValues[variable._id] ?? variable._source.data}
+                    onChange={e => handleChange(variable._id, e.target.value)}
                     className="border px-2 py-1 w-full"
                     disabled={loading}
                   />
                 </TableCell>
-                <TableCell>{new Date(variable.timestamp).toLocaleString()}</TableCell>
+                <TableCell>{new Date(variable._source["@timestamp"]).toLocaleString()}</TableCell>
                 <TableCell className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSave(variable.id)}
+                    onClick={() => handleSave(variable._id)}
                     disabled={loading}
                   >
                     Edit
@@ -179,7 +180,7 @@ function VariablesTable() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(variable.id)}
+                    onClick={() => handleDelete(variable._id)}
                     disabled={loading}
                   >
                     Delete

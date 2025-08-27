@@ -7,10 +7,10 @@ export class SlackController {
 
   @Post('send')
   async send(@Body() body: any) {
-    const { target, token, message } = body;
+    const { channelName, token, message } = body;
     if (!message) {
       throw new HttpException('Message is required', HttpStatus.BAD_REQUEST);
     }
-    return this.slackService.sendSlackMessage(target, token, message);
+    return this.slackService.sendSlackMessage(channelName, token, message);
   }
 }

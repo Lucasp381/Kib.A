@@ -18,9 +18,9 @@ import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {  saveSlackAlerter } from "@/components/alerters/slack/SlackService";
 import EditButton from "@/components/alerters/ui/EditButton";
 import { SlackAlerter, Alerter } from "@/types/alerters";
+import { saveAlerter, SetAndGetAlerters } from "@/lib/alerters";
 
 
 const type = "slack";
@@ -59,89 +59,80 @@ async function getSlackChannelId(channelName: string, token: string): Promise<st
     }
 }
 
-interface SlackTabProps {
-    alerters: Alerter[] | undefined[];
-    editAlerter: Alerter | null;
-    initialValues?: Alerter | null;
-}
 
-export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
-    const [alerters, setAlerters] = useState<SlackAlerter[]>([]);
-    const [editAlerter, setEditAlerter] = useState<SlackAlerter | null>(null);
+
+export default function SlackAlerterTab() {
+    const [alerters, setAlerters] = useState<Alerter[]>([]);
+    const [editAlerter, setEditAlerter] = useState<Alerter | null>(null);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
     const [allChecked, setAllChecked] = useState(false);
     const [channelId, setChannelId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    
+    const data: Alerter = {
+        name: "Slack",
+        type: type,
+        description: "",
+        config: {
+            firedMessageTemplate: "",
+            recoveredMessageTemplate: "",
+            token: "",
+            channelId: "",
+            channelName: "",
+        },
+        enabled: false,
+        all_rules: true,
+        rules: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    };
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
-        defaultValues: initialValues?.type === type ? initialValues : {
-            id: "",
-            name: "Slack - new",
-            type,
-            description: "",
-            config: { firedMessageTemplate: "", recoveredMessageTemplate: "", token: "", channelId: undefined, channelName: "" },
-            enabled: false, // Disable by default
-            all_rules: false,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        },
+        defaultValues: data,
     });
 
-    const addSlackAlerter = () => {
+
+    async function addAlerter(data: Alerter) {
         setLoading(true);
-        const newAlerter: SlackAlerter = {
-            name: "Slack",
-            type,
-            description: "",
-            config: { firedMessageTemplate: "", recoveredMessageTemplate: "", token: "", channelId: "", channelName: "" },
-            enabled: false,
-            all_rules: false,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-        saveSlackAlerter(newAlerter, setAlerters, setEditAlerter);
+        await saveAlerter(data);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+        setAlerters(list);
+        setEditAlerter(list[list.length - 1] ?? null);
         setLoading(false);
-    };
+    }
+
+    async function fetchAlerters() {
+        setLoading(true);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+        setAlerters(list);
+        setEditAlerter(list[0] ?? null);
+        setLoading(false);
+    }
 
     useEffect(() => {
-        fetch(`/api/alerters?type=${type}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setAlerters(data);
-                if (data.length === 0) toast.info("No alerters found. Please add a new alerter.");
-                setEditAlerter(data[0] ?? null);
-            });
+        setLoading(true);
+        fetchAlerters();
+        setLoading(false);
     }, []);
 
-    useEffect(() => {
-        if (initialValues?.type === type) form.reset(initialValues);
-    }, [initialValues]);
 
     useEffect(() => {
         fetch("/api/kibana/rules?limit=10000")
             .then((res) => res.json())
             .then((data) => {
                 setRules(data.data);
-                const { channelName, token } = form.getValues().config;
-                if (channelName && token) {
-                    getSlackChannelId(channelName, token).then((id) => {
-                        if (!id) return;
-                        form.setValue("config.channelId", id, { shouldValidate: true });
-                        setChannelId(id);
-                    });
-                }
             });
     }, []);
 
     useEffect(() => {
-        if (editAlerter?.type === type) {
-            form.reset(editAlerter);
-            setChannelId(editAlerter.config.channelId || null);
+        if (editAlerter) {
+            if (editAlerter?.type === type) {
+                form.reset(editAlerter);
+            }
         }
-
     }, [editAlerter]);
 
     return (
@@ -152,32 +143,31 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                         {/* Liste des alerters */}
                         <Card className="fixed flex col-1 border-none shadow-none h-[calc(100vh-190px)] w-70">
                             <CardContent className="flex p-0 m-0">
-                                                               <div className="flex flex-col gap-2 w-full h-[calc(100vh-190px)]">
-                                                               <div className="flex flex-col gap-2 ">
-                                                                   <AlertersMenu
-                                                                       alerters={alerters}
-                                                                       editAlerter={editAlerter}
-                                                                       setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
-                                                                       addAlerter={addSlackAlerter}
-                                                                       type={type}
-                                                                   />
-                                                               </div>
-                               
-                                                               <div className="flex flex-col items-center justify-center">
-                                                                   <Button
-                                                                       className="w-full max-w-[200px] mt-5 cursor-pointer"
-                                                                       variant="outline"
-                                                                       onClick={addSlackAlerter}
-                                                                   >
-                                                                       <Plus className="mr-2" />
-                                                                       Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
-                                                                   </Button>
-                                                               </div>
-                                                               </div>
-                                                               <div
-                                                           className="self-stretch w-[1px] mx-5 bg-gray-300 opacity-50"
-                                                           aria-hidden
-                                                       />
+                                <div className="flex flex-col gap-2 w-full h-[calc(100vh-190px)]">
+                                    <div className="flex flex-col gap-2 ">
+                                        <AlertersMenu
+                                            alerters={alerters}
+                                            editAlerter={editAlerter}
+                                            setEditAlerter={setEditAlerter}
+                                            type={type}
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col items-center justify-center">
+                                        <Button
+                                            className="w-full max-w-[200px] mt-5 cursor-pointer"
+                                            variant="outline"
+                                            onClick={() => addAlerter(data)}
+                                        >
+                                            <Plus className="mr-2" />
+                                            Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div
+                                    className="self-stretch w-[1px] mx-5 bg-gray-300 opacity-50"
+                                    aria-hidden
+                                />
                             </CardContent>
                         </Card>
                         <Card
@@ -190,16 +180,23 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                                     <Form {...form}   >
 
                                         <form
-                                            onSubmit={form.handleSubmit((data) => {
-                                                console.log("Saving alerter data:", data);
-                                                saveSlackAlerter(data, setAlerters);
-
+                                            onSubmit={form.handleSubmit(async (data) => {
+                                                try {
+                                                    await saveAlerter(data);
+                                                    await SetAndGetAlerters(type, setAlerters);
+                                                    toast.success("Alerter saved successfully");
+                                                } catch (error) {
+                                                    toast.error("Error saving alerter: " + error);
+                                                }
                                             })}
+                                            onChange={() => {
+                                                setEditAlerter(form.getValues());
+                                            }}
                                             className="space-y-6 max-h-full w-full"
                                         >
                                             <div>
-                                                <EditButton 
-                                                    
+                                                <EditButton
+
                                                     setEditAlerter={setEditAlerter}
                                                     editAlerter={editAlerter}
                                                     loading={loading}
@@ -335,9 +332,9 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                    This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
-                                                                    Slack use it own syntax, so you can use *bold*, _italic_, `inline code`...<br />
-                                                                    See <a href="https://api.slack.com/reference/surfaces/formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Slack formatting</a> for more details.                                                                    </FormDescription>
+                                                                        This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
+                                                                        Slack use it own syntax, so you can use *bold*, _italic_, `inline code`...<br />
+                                                                        See <a href="https://api.slack.com/reference/surfaces/formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Slack formatting</a> for more details.                                                                    </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>
                                                             )}
@@ -357,9 +354,9 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                    This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
-                                                                    Slack use it own syntax, so you can use *bold*, _italic_, `inline code`...<br />
-                                                                    See <a href="https://api.slack.com/reference/surfaces/formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Slack formatting</a> for more details.
+                                                                        This is the message template for alerts. Right clic to use Emoji or placeholders.<br />
+                                                                        Slack use it own syntax, so you can use *bold*, _italic_, `inline code`...<br />
+                                                                        See <a href="https://api.slack.com/reference/surfaces/formatting" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Slack formatting</a> for more details.
                                                                     </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -455,7 +452,7 @@ export default function SlackAlerterTab({ initialValues }: SlackTabProps) {
                     </div>
                 </Card>
             ) : (
-                <Button className="max-w-[200px] mt-5" variant="outline" onClick={addSlackAlerter}>
+                <Button className="max-w-[200px] mt-5" variant="outline" onClick={() => addAlerter(data)}>
                     <Plus className="mr-2" />
                     Add Slack Alerter
                 </Button>

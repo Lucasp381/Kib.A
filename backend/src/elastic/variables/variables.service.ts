@@ -8,11 +8,11 @@ export class VariablesService {
   private readonly logger = new Logger(VariablesService.name);
 
   constructor(private readonly esService: ElasticsearchService) {}
-  
-  create(createVariableDto: CreateVariableDto) {
-    this.logger.log(`Creating variable with data: ${JSON.stringify(createVariableDto)}`);
-    const index = 'variables';
-    this.esService.index(index, createVariableDto);
+  private readonly index = `${process.env.KIBA_INDEX_PREFIX}-variables`;
+
+  create({ index, key, value }: { index: string; key: string; value: string }) {
+    this.logger.log(`Creating variable with data: ${JSON.stringify({ index, key, value })}`);
+    this.esService.index(this.index, { data: value, "@timestamp": new Date() }, key);
     return 'This action adds a new variable';
   }
 

@@ -6,13 +6,12 @@ import { Dot } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alerter, EmailAlerter, SlackAlerter, DiscordAlerter, TeamsAlerter, TelegramAlerter } from "@/types/alerters";
 interface AlertersMenuProps<T extends Alerter> {
-    alerters: T[];
+    alerters: Alerter[];
     editAlerter: T | null;
     setEditAlerter: React.Dispatch<React.SetStateAction<Alerter | null>>;
-    addAlerter: React.Dispatch<React.SetStateAction<T[]>>;
     type: T["type"];
 }
-export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter, setEditAlerter, addAlerter, type }: AlertersMenuProps<T>) {
+export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter, setEditAlerter, type }: AlertersMenuProps<T>) {
     return (
 
         <ScrollArea className="max-h-[calc(100vh-300px)] w-full">

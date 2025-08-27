@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 
 export async function checkTeamsAlerterExists(name: string): Promise<boolean> {
-    return fetch(`/api/alerters?name=${name}`)
+    return fetch(`/api/backend/alerters?name=${name}`)
         .then((res) => {
             if (!res.ok) {
                 throw new Error(`Failed to check alerter existence: ${res.statusText}`);
@@ -27,7 +27,7 @@ export async function saveTeamsAlerter(
 ) {
 
 
-    await fetch("/api/alerters", {
+    await fetch("/api/backend/alerters", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export async function deleteTeamsAlerter(id: string, alerters: TeamsAlerter[], s
     if (!window.confirm("Are you sure you want to delete this Teams alerter?")) {
         return;
     }
-    await fetch(`/api/alerters?id=${id}`, {
+    await fetch(`/api/backend/alerters?id=${id}`, {
         method: "DELETE",
     })
         .then((res) => {

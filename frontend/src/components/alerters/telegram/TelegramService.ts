@@ -12,7 +12,7 @@ export async function saveTelegramAlerter(
         data.enabled = false; // Disable if required fields are missing
     }
 
-    await fetch("/api/alerters", {
+    await fetch("/api/backend/alerters", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export async function deleteTelegramAlerter(id: string, alerters: TelegramAlerte
     if (!window.confirm("Are you sure you want to delete this Telegram alerter?")) {
         return;
     }
-    fetch(`/api/alerters?id=${id}`, {
+    fetch(`/api/backend/alerters?id=${id}`, {
         method: "DELETE",
     })
         .then((res) => {

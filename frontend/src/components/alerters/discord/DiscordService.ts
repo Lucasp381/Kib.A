@@ -1,10 +1,11 @@
-import { DiscordAlerter } from "@/types/alerters";
+import { DiscordAlerter, Alerter } from "@/types/alerters";
+import React from "react";
 import { toast } from "sonner";
-
+import axios from "axios";
 
 
 export async function checkDiscordAlerterExists(name: string): Promise<boolean> {
-    return fetch(`/api/alerters?name=${name}`)
+    return fetch(`/api/backend/alerters?name=${name}`)
         .then((res) => {
             if (!res.ok) {
                 throw new Error(`Failed to check alerter existence: ${res.statusText}`);
@@ -18,6 +19,26 @@ export async function checkDiscordAlerterExists(name: string): Promise<boolean> 
         });
 }
 
+export async function SetAndGetAlerters(type: string, setAlerters: React.Dispatch<React.SetStateAction<Alerter[]>>) {
+
+
+    fetch(`/api/backend/alerters?type=${type}`)
+        .then((res) => res.json())
+        .then((data) => {
+            setAlerters(data as Alerter[]);
+           
+        })
+        .catch((err) => {
+            console.error("Erreur lors de la récupération des Discord alerters :", err);
+        });
+}
+export async function saveAlerter(
+    data: Alerter,
+
+) {
+    await axios.post("/api/backend/alerters", data);
+
+}
 
 export async function saveDiscordAlerter(
     data: DiscordAlerter,
@@ -27,7 +48,7 @@ export async function saveDiscordAlerter(
 ) {
 
 
-    await fetch("/api/alerters", {
+    await fetch("/api/backend/alerters", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -44,16 +65,14 @@ export async function saveDiscordAlerter(
                 if (!data.id) {
                     data.id = responseData.response._id; // Assuming the response contains the new ID
                     console.log(data);
-                    if (setAlerters) {
-                        if (setAlerters) {
+
                             if (setAlerters) {
                                 setAlerters((prevAlerters) => {
                                     const safePrev = Array.isArray(prevAlerters) ? prevAlerters : [];
                                     return [...safePrev, data];
                                 });
                             }
-                        }
-                    }
+
                     if (setEditAlerter) {
                         setEditAlerter(data);
                     }
@@ -87,7 +106,7 @@ export async function deleteDiscordAlerter(id: string, alerters: DiscordAlerter[
     if (!window.confirm("Are you sure you want to delete this Discord alerter?")) {
         return;
     }
-    await fetch(`/api/alerters?id=${id}`, {
+    await fetch(`/api/backend/alerters?id=${id}`, {
         method: "DELETE",
     })
         .then((res) => {

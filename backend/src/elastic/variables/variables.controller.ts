@@ -3,13 +3,13 @@ import { VariablesService } from './variables.service';
 import { CreateVariableDto } from './dto/create-variable.dto';
 import { UpdateVariableDto } from './dto/update-variable.dto';
 
-@Controller('variables')
+@Controller('elastic/variables')
 export class VariablesController {
   constructor(private readonly variablesService: VariablesService) {}
 
   @Post()
-  create(@Body() createVariableDto: CreateVariableDto) {
-    return this.variablesService.create(createVariableDto);
+  create(@Body() { index, key, value }: { index: string; key: string; value: string }) {
+    return this.variablesService.create({ index, key, value });
   }
 
   @Get()

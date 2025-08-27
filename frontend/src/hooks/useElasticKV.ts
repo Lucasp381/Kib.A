@@ -8,7 +8,7 @@ type ElasticKVResponse<T> =
   | { ok: false; error: string }
 
 export function useElasticKV<T = string>() {
-  const baseUrl = "/api/elastic/kv"
+  const baseUrl = "/api/backend/elastic/variables"
 
   const set = useCallback(async (key: string, value: string): Promise<ElasticKVResponse<T>> => {
     if (!key) return { ok: false, error: "Key is required" }
@@ -30,13 +30,12 @@ export function useElasticKV<T = string>() {
   const get = useCallback(async (key: string): Promise<ElasticKVResponse<T>> => {
     if (!key) return { ok: false, error: "Key is required" }
     try {
-      const url = new URL(baseUrl, location.origin)
-      url.searchParams.set("key", key)
+      const url = new URL(`${baseUrl}/${key}`, location.origin)
 
       const res = await fetch(url.toString())
       const data = await res.json()
       if (!res.ok) return { ok: false, error: data.error || "Unknown error" }
-      if (data.found) return { ok: true, value: data._source?.data }
+      if (data.length > 0) return { ok: true, value: data[0]._source?.data }
       return { ok: false, error: "Not found" }
     } catch (error) {
       const e = error as Error
@@ -47,8 +46,8 @@ export function useElasticKV<T = string>() {
   const del = useCallback(async (key: string): Promise<ElasticKVResponse<unknown>> => {
     if (!key) return { ok: false, error: "Key is required" }
     try {
-      const url = new URL(baseUrl, location.origin)
-      url.searchParams.set("key", key)
+      const url = new URL(`${baseUrl}/${key}`, location.origin)
+
 
       const res = await fetch(url.toString(), { method: "DELETE" })
       const data = await res.json()

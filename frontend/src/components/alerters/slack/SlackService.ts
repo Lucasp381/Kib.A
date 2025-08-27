@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 
 export async function checkSlackAlerterExists(name: string): Promise<boolean> {
-    return fetch(`/api/alerters?name=${name}`)
+    return fetch(`/api/backend/alerters?name=${name}`)
         .then((res) => {
             if (!res.ok) {
                 throw new Error(`Failed to check alerter existence: ${res.statusText}`);
@@ -32,7 +32,7 @@ export async function saveSlackAlerter(
         data.enabled = false; // Disable if required fields are missing
     }
 
-    await fetch("/api/alerters", {
+    await fetch("/api/backend/alerters", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export async function deleteSlackAlerter(id: string, alerters: SlackAlerter[], s
     if (!window.confirm("Are you sure you want to delete this Slack alerter?")) {
         return;
     }
-    fetch(`/api/alerters?id=${id}`, {
+    fetch(`/api/backend/alerters?id=${id}`, {
         method: "DELETE",
     })
         .then((res) => {

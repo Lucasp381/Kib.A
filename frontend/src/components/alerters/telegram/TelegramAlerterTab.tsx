@@ -18,9 +18,9 @@ import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { saveTelegramAlerter } from "@/components/alerters/telegram/TelegramService";
 import EditButton from "@/components/alerters/ui/EditButton";
-import { TelegramAlerter, Alerter } from "@/types/alerters";
+import {  Alerter } from "@/types/alerters";
+import { saveAlerter, SetAndGetAlerters } from "@/lib/alerters";
 
 
 const type = "telegram";
@@ -45,66 +45,61 @@ const FormSchema = z.object({
 
 
 
-interface TelegramTabProps {
-    alerters: Alerter[] | undefined[];
-    editAlerter: Alerter | null;
-    initialValues?: Alerter | null;
-}
 
-export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) {
-    const [alerters, setAlerters] = useState<TelegramAlerter[]>([]);
-    const [editAlerter, setEditAlerter] = useState<TelegramAlerter | null>(null);
+
+export default function TelegramAlerterTab() {
+    const [alerters, setAlerters] = useState<Alerter[]>([]);
+    const [editAlerter, setEditAlerter] = useState<Alerter | null>(null);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
     const [allChecked, setAllChecked] = useState(false);
-    const [channelId, setChannelId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-
+    const data: Alerter = {
+        id: "",
+        name: "Telegram - new",
+        type,
+        description: "",
+        config: { firedMessageTemplate: "", recoveredMessageTemplate: "", token: "", chatId: "0" },
+        enabled: false, // Disable by default
+        all_rules: false,
+        rules: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    }
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
-        defaultValues: initialValues?.type === type ? initialValues : {
-            id: "",
-            name: "Telegram - new",
-            type,
-            description: "",
-            config: { firedMessageTemplate: "", recoveredMessageTemplate: "", token: "", chatId: "0" },
-            enabled: false, // Disable by default
-            all_rules: false,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        },
+        defaultValues: data,
     });
 
-    const addTelegramAlerter = () => {
+    async function addAlerter(data: Alerter) {
         setLoading(true);
-        const newAlerter: TelegramAlerter = {
-            name: "Telegram",
-            type,
-            description: "",
-            config: { firedMessageTemplate: "", recoveredMessageTemplate: "", token: "", chatId: "0" },
-            enabled: false,
-            all_rules: false,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-        saveTelegramAlerter(newAlerter, setAlerters, setEditAlerter);
+
+        await saveAlerter(data);
+
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+
+        setAlerters(list);
+        setEditAlerter(list[list.length - 1] ?? null);
+
         setLoading(false);
-    };
+    }
+
+    async function fetchAlerters() {
+        setLoading(true);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+        setAlerters(list);
+        setEditAlerter(list[0] ?? null);
+        setLoading(false);
+    }
 
     useEffect(() => {
-        fetch(`/api/alerters?type=${type}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setAlerters(data);
-                if (data.length === 0) toast.info("No alerters found. Please add a new alerter.");
-                setEditAlerter(data[0] ?? null);
-            });
+        setLoading(true);
+        fetchAlerters();
+        setLoading(false);
     }, []);
 
-    useEffect(() => {
-        if (initialValues?.type === type) form.reset(initialValues);
-    }, [initialValues]);
+
 
     useEffect(() => {
         fetch("/api/kibana/rules?limit=10000")
@@ -115,11 +110,13 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
     }, []);
 
     useEffect(() => {
-        if (editAlerter?.type === type) {
-            form.reset(editAlerter);
+        if (editAlerter) {
+            if (editAlerter?.type === type) {
+                form.reset(editAlerter);
+            }
         }
-
     }, [editAlerter]);
+
 
     return (
         <>
@@ -135,7 +132,6 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
                                             alerters={alerters}
                                             editAlerter={editAlerter}
                                             setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
-                                            addAlerter={addTelegramAlerter}
                                             type={type}
                                         />
                                     </div>
@@ -144,7 +140,7 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
                                         <Button
                                             className="w-full max-w-[200px] mt-5 cursor-pointer"
                                             variant="outline"
-                                            onClick={addTelegramAlerter}
+                                            onClick={() => addAlerter(data)}
                                         >
                                             <Plus className="mr-2" />
                                             Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
@@ -167,11 +163,18 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
                                     <Form {...form}   >
 
                                         <form
-                                            onSubmit={form.handleSubmit((data) => {
-                                                console.log("Saving alerter data:", data);
-                                                saveTelegramAlerter(data, setAlerters);
-
+                                            onSubmit={form.handleSubmit(async (data) => {
+                                                try {
+                                                    await saveAlerter(data);
+                                                    await SetAndGetAlerters(type, setAlerters);
+                                                    toast.success("Alerter saved successfully");
+                                                } catch (error) {
+                                                    toast.error("Error saving alerter: " + error);
+                                                }
                                             })}
+                                            onChange={() => {
+                                                setEditAlerter(form.getValues());
+                                            }}
                                             className="space-y-6 max-h-full w-full"
                                         >
                                             <div>
@@ -258,7 +261,7 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
                                                                 <FormItem>
                                                                     <FormLabel >Chat ID</FormLabel>
                                                                     <FormControl>
-                                                                        <Input  placeholder="Channel ID" className="w-[200px]"   {...field} />
+                                                                        <Input placeholder="Channel ID" className="w-[200px]"   {...field} />
                                                                     </FormControl>
                                                                     <FormDescription>
                                                                         this is the chat ID.
@@ -405,7 +408,7 @@ export default function TelegramAlerterTab({ initialValues }: TelegramTabProps) 
                     </div>
                 </Card>
             ) : (
-                <Button className="max-w-[200px] mt-5" variant="outline" onClick={addTelegramAlerter}>
+                <Button className="max-w-[200px] mt-5" variant="outline" onClick={() => addAlerter(data)}>
                     <Plus className="mr-2" />
                     Add Telegram Alerter
                 </Button>

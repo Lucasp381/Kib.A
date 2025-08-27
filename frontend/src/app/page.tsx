@@ -14,10 +14,10 @@ export default function DashboardPage() {
     const [alerts, setAlerts] = useState([]);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
     useEffect(() => {
-        fetch("/api/elastic/index?index=*alerts-*")
+        fetch("/api/backend/elastic/index/documents?index=*alerts-*")
             .then((res) => res.json())
             .then((result) => {
-                setAlerts(result.data);
+                setAlerts(result);
             });
 
     }, []);

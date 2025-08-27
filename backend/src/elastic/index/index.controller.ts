@@ -3,7 +3,7 @@ import { IndexService } from './index.service';
 import { CreateIndexDto } from './dto/create-index.dto';
 import { UpdateIndexDto } from './dto/update-index.dto';
 
-@Controller('index')
+@Controller('elastic/index')
 export class IndexController {
   constructor(private readonly indexService: IndexService) {}
 
@@ -11,8 +11,6 @@ export class IndexController {
   create(@Body() createIndexDto: CreateIndexDto) {
     return this.indexService.create(createIndexDto);
   }
-
- 
 
   @Get('documents')
   async findAllDocuments(@Query('index') index: string, @Query('limit') limit: number, @Query('page') page: number) {

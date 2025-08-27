@@ -51,9 +51,9 @@ export class SlackService {
       }
 
       const data = await slackRes.json();
-      return data;
+      return {success: true, data};
     } catch (err) {
-      return err instanceof Error ? err.message : "Unknown error";
+      return {success: false, message: err instanceof Error ? err.message : "Unknown error"};
     }
   }
 }

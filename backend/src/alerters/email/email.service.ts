@@ -51,10 +51,10 @@ export class EmailService {
     };
   
     const info = await transporter.sendMail(mailOptions);
-  
+    return {success: true, info};
   } catch (error) {
     this.logger.error("Error sending email:", error);
-    throw error;
+    return {success: false, message: error instanceof Error ? error.message : "Unknown error"};
   }
   }
 }

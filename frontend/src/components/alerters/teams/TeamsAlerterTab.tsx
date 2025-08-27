@@ -22,14 +22,12 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { saveTeamsAlerter } from "@/components/alerters/teams/TeamsService"; // Assurez-vous que cette fonction existe
 import { Card, CardContent } from "@/components/ui/card"
 import EditButton from "@/components/alerters/ui/EditButton"; // Assurez-vous que ce composant existe
-import { TeamsAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import { Alerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
 import AlertersMenu from "@/components/alerters/ui/AlertersMenu";
 import AlertersTextArea from "@/components/alerters/ui/AlertersTextArea";
-import { Label } from "@radix-ui/react-label";
+import { saveAlerter, SetAndGetAlerters } from "@/lib/alerters";
 
 const type = "teams"; // Définir le type d'alerter
 
@@ -64,120 +62,85 @@ export const FormSchema = z.object({
 
 })
 
+export default function TeamsAlerterTab() {
 
-
-
-
-
-interface TeamsTabProps {
-    alerters: Alerter[] | undefined[];
-    initialValues?: Alerter | null;
-}
-
-export default function TeamsAlerterTab({
-
-    initialValues
-}: TeamsTabProps) {
-
-    const [alerters, setAlerters] = useState<TeamsAlerter[]>([]);
-    const [editAlerter, setEditAlerter] = useState<TeamsAlerter | null>(null);
+    const [alerters, setAlerters] = useState<Alerter[]>([]);
+    const [editAlerter, setEditAlerter] = useState<Alerter | null>(null);
     const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
-    const [allRules, setAllRules] = useState(false);
     const [allChecked, setAllChecked] = useState(false);
-    const [channelName, setChannelName] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     type AlerterFormData = z.infer<typeof FormSchema>;
+    const data: Alerter = {
+        id: "",
+        name: "Teams - new",
+        type: type,
+        description: "",
+        config: {
+            firedMessageTemplate: "",
+            recoveredMessageTemplate: "",
+            webhook: "",
+            isAdaptiveCard: false
+        },
+        enabled: false, // Disable by default
+        all_rules: true,
+        rules: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    }
     const form = useForm<AlerterFormData>({
         resolver: zodResolver(FormSchema),
-        defaultValues: initialValues?.type === type ? initialValues : {
-            id: "",
-            name: "Teams - new",
-            type: type,
-            description: "",
-            config: {
-                firedMessageTemplate: "",
-                recoveredMessageTemplate: "",
-                webhook: "",
-                isAdaptiveCard: false
-            },
-            enabled: false, // Disable by default
-            all_rules: true,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        },
+        defaultValues: data,
     })
 
-    function addTeamsAlerter() {
+
+    async function addAlerter(data: Alerter) {
         setLoading(true);
-        const data: TeamsAlerter = {
-            name: "Teams",
-            type: type,
 
-            description: "",
-            config: {
+        await saveAlerter(data);
 
-                firedMessageTemplate: "",
-                recoveredMessageTemplate: "",
-                webhook: "",
-                isAdaptiveCard: false
-            },
-            enabled: false,
-            all_rules: true,
-            rules: [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-        saveTeamsAlerter(data, setAlerters, setEditAlerter);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+
+        setAlerters(list);
+        setEditAlerter(list[list.length - 1] ?? null);
 
         setLoading(false);
-
-
     }
 
+    async function fetchAlerters() {
+        setLoading(true);
+        const res = await fetch(`/api/backend/alerters?type=${type}`);
+        const list = await res.json();
+        setAlerters(list);
+        setEditAlerter(list[0] ?? null);
+        setLoading(false);
+    }
 
     useEffect(() => {
-        fetch(`/api/alerters?type=${type}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setAlerters(data);
-                if (data.length === 0) {
-                    toast.info("No alerters found. Please add a new alerter.");
-                }
-                // ✅ sélectionne automatiquement le 1er alerter du tab
-                setEditAlerter(data[0] ?? null);
-            });
-    }, []);
-    useEffect(() => {
+        setLoading(true);
+        fetchAlerters();
         setLoading(false);
-        if (initialValues) {
-            if (initialValues?.type === type) {
-                form.reset(initialValues);
-            }
-        }
-    }, [initialValues]);
+    }, []);
+
+
+
     useEffect(() => {
         fetch("/api/kibana/rules?limit=10000")
             .then((res) => res.json())
             .then((data) => {
                 setRules(data.data);
             });
-
-
     }, []);
 
     useEffect(() => {
-
         if (editAlerter) {
-
             if (editAlerter?.type === type) {
-
                 form.reset(editAlerter);
-
             }
         }
     }, [editAlerter]);
+
 
 
 
@@ -194,8 +157,7 @@ export default function TeamsAlerterTab({
                                         <AlertersMenu
                                             alerters={alerters}
                                             editAlerter={editAlerter}
-                                            setEditAlerter={setEditAlerter as React.Dispatch<React.SetStateAction<Alerter | null>>}
-                                            addAlerter={addTeamsAlerter}
+                                            setEditAlerter={setEditAlerter}
                                             type={type}
                                         />
                                     </div>
@@ -204,7 +166,7 @@ export default function TeamsAlerterTab({
                                         <Button
                                             className="w-full max-w-[200px] mt-5 cursor-pointer"
                                             variant="outline"
-                                            onClick={addTeamsAlerter}
+                                            onClick={() => addAlerter(data)}
                                         >
                                             <Plus className="mr-2" />
                                             Add {type.charAt(0).toUpperCase() + type.slice(1)} Alerter
@@ -232,10 +194,18 @@ export default function TeamsAlerterTab({
                                     <Form {...form}   >
 
                                         <form
-                                            onSubmit={form.handleSubmit((data) => {
-                                                saveTeamsAlerter(data, setAlerters);
-
+                                            onSubmit={form.handleSubmit(async (data) => {
+                                                try {
+                                                    await saveAlerter(data);
+                                                    await SetAndGetAlerters(type, setAlerters);
+                                                    toast.success("Alerter saved successfully");
+                                                } catch (error) {
+                                                    toast.error("Error saving alerter: " + error);
+                                                }
                                             })}
+                                            onChange={() => {
+                                                setEditAlerter(form.getValues());
+                                            }}
                                             className="space-y-6 max-h-full w-full"
                                         >
                                             <div >
@@ -335,7 +305,7 @@ export default function TeamsAlerterTab({
                                                                         />
                                                                     </FormControl>
                                                                     <FormDescription>
-                                                                        This is your Teams webhook.
+                                                                        This is your Teams webhook url.
                                                                     </FormDescription>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -501,7 +471,7 @@ export default function TeamsAlerterTab({
                     </div>
                 </Card>
             ) : (
-                <Button className="max-w-[200px] mt-5" variant="outline" onClick={addTeamsAlerter} >
+                <Button className="max-w-[200px] mt-5" variant="outline" onClick={() => addAlerter(data)} >
                     <Plus className="mr-2" />
                     Add Teams Alerter
                 </Button>

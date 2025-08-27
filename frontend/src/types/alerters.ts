@@ -1,127 +1,73 @@
-
-export interface DiscordConfigType {
-    token: string;
-    channel_id: string;
-    message: string;
-}
-export interface EmailConfigType {
-    smtp_server: string;
-    port: number;
-    username: string;
-    password: string;
-    from_address: string;
-    to_addresses: string[];
-    subject: string;
-    body: string;
-}
-export interface SlackConfigType {
-    webhook_url: string;
-}
-export interface WebhookConfigType {
-    url: string;
-}
-
-export type Alerter =  SlackAlerter | DiscordAlerter | EmailAlerter | TeamsAlerter | TelegramAlerter
-
-export type EmailAlerter = {
-    id?: string;
-    name: string;
-    type: "email";
-    config: {
-        smtp_server: string;
-        port: number;
-        username: string;
-        password: string;
-        from_address: string;
-        to_addresses: string;
-        cc_addresses?: string;
-        firedMessageTemplate?: string;
-        recoveredMessageTemplate?: string;
-        firedSubjectTemplate?: string;
-        recoveredSubjectTemplate?: string;
-    }
-    description?: string; // <- optionnel   
-    all_rules?: boolean;
-    rules?: { id: string; name: string }[];
-    enabled?: boolean;
-    created_at?: string;
-    updated_at?: string;
+// Base commune
+type BaseAlerter<TType extends string, TConfig> = {
+  id?: string;
+  name: string;
+  type: TType;
+  config: TConfig;
+  description?: string;
+  all_rules?: boolean;
+  rules?: { id: string; name: string }[];
+  enabled?: boolean;
+  created_at?: string;
+  updated_at?: string;
 };
 
-
-export type DiscordAlerter = {
-    id?: string;
-    name: string;
-    type: "discord";
-    config: {
-        firedMessageTemplate?: string;
-        recoveredMessageTemplate?: string;
-        channelId: string;
-        token: string;
-        channelName?: string;
-    };
-    description?: string; // <- optionnel
-    all_rules?: boolean;
-    rules?: { id: string; name: string }[];
-    enabled?: boolean;
-    created_at?: string;
-    updated_at?: string;
+// Configs spécifiques, props inchangées
+type EmailConfig = {
+  username?: string;
+  password?: string;
+  smtp_server?: string; 
+  port?: number;
+  from_address?: string;
+  to_addresses?: string;
+  cc_addresses?: string;
+  firedSubjectTemplate?: string;
+  firedMessageTemplate?: string;
+  recoveredSubjectTemplate?: string;
+  recoveredMessageTemplate?: string;
 };
 
-export type SlackAlerter = {
-    id?: string;
-    name: string;
-    type: "slack" 
-    config: {
-        firedMessageTemplate?: string;
-        recoveredMessageTemplate?: string;
-        channelId: string;
-        token: string;
-        channelName?: string;
-    };
-    description?: string; // <- optionnel
-    all_rules?: boolean;
-    rules?: { id: string; name: string }[];
-    enabled?: boolean;
-    created_at?: string;
-    updated_at?: string;
+type DiscordConfig = {
+  firedMessageTemplate?: string;
+  recoveredMessageTemplate?: string;
+  channelId: string;
+  token: string;
+  channelName?: string;
 };
 
-export type TelegramAlerter = {
-    id?: string;
-    name: string;
-    type: "telegram";
-    config: {
-        firedMessageTemplate?: string;
-        recoveredMessageTemplate?: string;
-        chatId: string;
-        token: string;
-    };
-    description?: string; // <- optionnel
-    all_rules?: boolean;
-    rules?: { id: string; name: string }[];
-    enabled?: boolean;
-    created_at?: string;
-    updated_at?: string;
+type SlackConfig = {
+  firedMessageTemplate?: string;
+  recoveredMessageTemplate?: string;
+  channelId: string;
+  token: string;
+  channelName?: string;
 };
 
-        
-
-export type TeamsAlerter = {
-    id?: string;
-    name: string;
-    type: "teams";
-    config: {
-        firedMessageTemplate?: string;
-        recoveredMessageTemplate?: string;
-        webhook: string;
-        isAdaptiveCard?: boolean;
-
-    };
-    description?: string; // <- optionnel
-    all_rules?: boolean;
-    rules?: { id: string; name: string }[];
-    enabled?: boolean;
-    created_at?: string;
-    updated_at?: string;
+type TelegramConfig = {
+  firedMessageTemplate?: string;
+  recoveredMessageTemplate?: string;
+  chatId: string;
+  token: string;
 };
+
+type TeamsConfig = {
+  firedMessageTemplate?: string;
+  recoveredMessageTemplate?: string;
+  webhook: string;
+  isAdaptiveCard?: boolean;
+};
+
+// Types finaux
+export type EmailAlerter = BaseAlerter<"email", EmailConfig>;
+export type DiscordAlerter = BaseAlerter<"discord", DiscordConfig>;
+export type SlackAlerter = BaseAlerter<"slack", SlackConfig>;
+export type TelegramAlerter = BaseAlerter<"telegram", TelegramConfig>;
+export type TeamsAlerter = BaseAlerter<"teams", TeamsConfig>;
+
+// Union globale
+export type Alerter =
+  | EmailAlerter
+  | DiscordAlerter
+  | SlackAlerter
+  | TelegramAlerter
+  | TeamsAlerter;
