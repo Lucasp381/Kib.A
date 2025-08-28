@@ -163,6 +163,7 @@ http://localhost:8080
 - [X] Add Telegram 
 - [ ] Add Custom alerters
 - [ ] Scheduled mute windows
+- [ ] Secure connection
 
 ---
 
