@@ -137,10 +137,13 @@ http://localhost:8080
 **Slack**:
 - Require Slack Apps token
 - Permissions:
-  - channels:read
-  - chat:write
-  - chat:write.public
-  - 
+  - Public channels:     
+    - channels:read
+    - chat:write
+    - chat:write.public
+  - Privates channels:
+    - groups:write
+    - groups:read 
 **Teams**:
 - Webook url
 
