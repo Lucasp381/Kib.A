@@ -143,7 +143,8 @@ http://localhost:8080
     - chat:write.public
   - Privates channels:
     - groups:write
-    - groups:read 
+    - groups:read
+      
 **Teams**:
 - Webook url
 
