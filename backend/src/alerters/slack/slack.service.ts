@@ -12,7 +12,7 @@ export class SlackService {
     message = await this.utilsService.replacePlaceholders(message, alert);
 
 
-    const slackRes = await fetch(`https://slack.com/api/conversations.list`, {
+    const slackRes = await fetch(`https://slack.com/api/conversations.list?types=public_channel,private_channel`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
