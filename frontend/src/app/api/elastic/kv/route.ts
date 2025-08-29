@@ -1,4 +1,3 @@
-// kib.a/src/app/api/elastic/kv/route.ts
 import { esClient } from '@/lib/elasticsearch';
 const index = process.env.KIBA_INDEX_PREFIX + '-variables';
 export async function POST(req: Request) {

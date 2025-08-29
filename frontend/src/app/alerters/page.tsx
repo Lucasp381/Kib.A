@@ -26,7 +26,6 @@ const tabs = [
   { value: "slack", label: "Slack", icon: <FontAwesomeIcon icon={faSlack} className="text-main-500" /> },
   { value: "email", label: "Email", icon: <FontAwesomeIcon icon={faEnvelope} className="text-main-500" /> },
   { value: "teams", label: "Teams", icon: <FontAwesomeIcon icon={faMicrosoft} className="text-main-500" /> },
-
   { value: "telegram", label: "Telegram", icon: <FontAwesomeIcon icon={faTelegram} className="text-main-500" /> },
   { value: "custom", label: "Custom", icon: <Code className="text-main-500" /> },
 ];
@@ -35,11 +34,6 @@ export default function AlertersView() {
 
 
   const [activeTab, setActiveTab] = useState("discord");
-  const [alerters, setAlerters] = useState<Alerter[]>([]);
-  const [editAlerter, setEditAlerter] = useState<Alerter | null>(null); // ✅ null, pas []
-
-
-
 
   return (
     <Card className={cardClass}>

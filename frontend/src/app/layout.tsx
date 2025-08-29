@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton"; // ajoute ça en haut
-import WorkerControl from "@/components/worker/WorkerControl";
+import  Custom503  from "@/components/errorsPages/503"
+import { set } from "zod";import WorkerControl from "@/components/worker/WorkerControl";
 
 const geistSans = localFont({
   src: [
@@ -62,45 +63,38 @@ export default function RootLayout({
   const [screenWidth, setScreenWidth] = useState(0);
   const [esStatus, setEsStatus] = useState<{ status: string } | null>(null);
   const [kibanaStatus, setKibanaStatus] = useState<{ status: { overall: { level: string } } } | null>(null);
+  const [esError, setEsError] = useState<string >("");
+  const [kibanaError, setKibanaError] = useState<string >("");
   useEffect(() => {
     const fetchEsStatus = async () => {
       try {
         const response = await fetch("/api/elastic/status");
         const data = await response.json();
-        console.log("Elasticsearch status:", data);
         setEsStatus(data);
-        if (data.status) {
-
-          toast.success("Elasticsearch status fetched successfully");
-        } else {
-
-          toast.error("Error fetching Elasticsearch status");
+        if (!data.status) {
+          setEsError(data.error || "");
         }
       } catch (error) {
-        toast.error("Error fetching Elasticsearch status");
-        console.error("Error fetching Elasticsearch status:", error);
-        setEsStatus(null);
+        setEsError((error as Error).message);
+        console.log("Es error:", (error as Error).message);
       }
-      console.log("e", esStatus)
 
     };
     const fetchKibanaStatus = async () => {
       try {
         const response = await fetch("/api/kibana/status");
         const data = await response.json();
-        console.log("Kibana status:", data);
         setKibanaStatus(data);
-        if (data.status) {
-          toast.success("Kibana status fetched successfully");
-        } else {
-          toast.error("Error fetching Kibana status");
+        if (!data.status) {
+          setKibanaError(data.error == "This operation was aborted" ? "Kibana doesn't answer in time" : data.error);
         }
+
       } catch (error) {
-        toast.error("Error fetching Kibana status");
         console.error("Error fetching Kibana status:", error);
-        setKibanaStatus(null);
+        
+        setKibanaError((error as Error).message);
+        console.log("Kibana error:", error);
       }
-      console.log("k", kibanaStatus);
     };
     fetchKibanaStatus();
     fetchEsStatus();
@@ -135,7 +129,7 @@ export default function RootLayout({
             <header className="sticky top-0 z-50 col-span-2 flex items-center justify-between bg-card border-b border-gray-200 dark:border-gray-700 p-4 shadow-md">
               {showLabel && (
                 <>
-                  <div className="inline items-center gap-2">
+                  <a className="inline items-center gap-2" href="/">
                     <h1 className="font-extrabold text-4xl text-main-600 ml-20">
                       Kib.<span className="text-red-600">A</span>
                     </h1>
@@ -194,13 +188,9 @@ export default function RootLayout({
                 <Skeleton className="w-[80%] h-[50%] rounded-xl" />
                 <Skeleton className="w-[80%] h-80 rounded-xl" />
               </div>
-            ) : esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available" ? (
+            ) :  esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available"  ? (
               // Bloc d'erreur si ES ou Kibana est indisponible
-              <Card className="w-screen border-0 shadow-none">
-                <p className="text-2xl text-muted-foreground text-center">
-                  Service unavailable, check Kibana or Elasticsearch configuration
-                </p>
-              </Card>
+              <Custom503 error={[esError, kibanaError]} />
             ) : (
               // Sinon, on affiche le contenu normal
               <div className="grid col-span-2 grid-cols-[auto_1fr] h-[calc(100vh-93px)]">

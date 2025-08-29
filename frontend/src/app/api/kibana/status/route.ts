@@ -25,8 +25,9 @@ export async function GET(
     signal: controller.signal,
 
     });
-
+    
     clearTimeout(timeout);
+
     if (!res.ok) {
       console.error('Error fetching status:', res);
       return NextResponse.json({ error: 'Failed to fetch status' }, { status: 500 });

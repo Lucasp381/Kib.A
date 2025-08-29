@@ -41,11 +41,9 @@ export default function DashboardPage() {
                     Here you can view the latest alerts from your Kibana instance.
                 </CardDescription>
                 
-                { alerts && alerts.length > 0 ? (
+
                 <AlertsTable pageSize={10}/>
-                ) : (
-                    <div className="text-center text-gray-500">No alerts found.</div>
-                )}
+               
                
             </Card>
             <Separator />
@@ -56,12 +54,9 @@ export default function DashboardPage() {
                         <CardDescription className="text-main-500">
                             Here you can view the latest rules from your Kibana instance.
                         </CardDescription>
-                    {rules && rules.length > 0 ? (
+                   
                     <RulesTable  />
-                    ) : (
-                    <div className="text-center text-gray-500">No rules found.</div>
-                    )}
-                    
+                   
                 
                     </>
 
