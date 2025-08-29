@@ -6,7 +6,7 @@ import { AlertersService } from './alerters/alerters.service';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { WorkersModule } from './workers/workers.module';
+import { WorkerModule } from './worker/worker.module';
 import { TeamsModule } from './alerters/teams/teams.module';
 import { TelegramModule } from './alerters/telegram/telegram.module';
 import { VariablesModule } from './elastic/variables/variables.module';
@@ -22,7 +22,7 @@ import { ElasticsearchModule } from './clients/elasticsearch.module';
       isGlobal: true, // rend le module disponible dans toute l'application
       envFilePath: '.env', // chemin vers ton fichier .env
     }),
-    WorkersModule, TeamsModule, VariablesModule, TelegramModule, DiscordModule, AlertersModule, CryptModule, ElasticsearchModule],
+    WorkerModule, TeamsModule, VariablesModule, TelegramModule, DiscordModule, AlertersModule, CryptModule, ElasticsearchModule],
   controllers: [
     KibanaController,
     AlertersController, AppController],

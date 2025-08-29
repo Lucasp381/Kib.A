@@ -17,7 +17,7 @@ export default function DashboardPage() {
         fetch("/api/backend/elastic/index/documents?index=*alerts-*")
             .then((res) => res.json())
             .then((result) => {
-                setAlerts(result);
+                setAlerts(result.data);
             });
 
     }, []);

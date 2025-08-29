@@ -1,4 +1,5 @@
-import { Catch, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DiscordService } from 'src/alerters/discord/discord.service';
 import { SlackService } from 'src/alerters/slack/slack.service';
 import { TeamsService } from 'src/alerters/teams/teams.service';
@@ -6,34 +7,22 @@ import { EmailService } from 'src/alerters/email/email.service';
 import { TelegramService } from 'src/alerters/telegram/telegram.service';
 import { CryptService } from 'src/crypt/crypt.service';
 import { IndexService } from 'src/elastic/index/index.service';
-interface Alerter {
-  _source?: {
-    name?: string;
-    type: string;
-    enabled: boolean;
-    "@timestamp"?: string;
-    all_rules?: boolean;
-    description?: string;
-    rules?: { id: string }[];
-    config?: object;
-    _id?: string;
-    created_at?: string;
-    updated_at?: string;
-  };
 
-}
 @Injectable()
 export class WorkersService implements OnModuleInit {
-
-
   private readonly logger = new Logger(WorkersService.name);
-  private readonly INTERVAL = process.env.POLL_EVERY ? parseInt(process.env.POLL_EVERY) * 1000 : 10000; // 10 secondes
+  private readonly INTERVAL =
+    process.env.POLL_EVERY ? parseInt(process.env.POLL_EVERY) * 1000 : 10000;
   private readonly ELASTIC_ALERTS_INDEX = process.env.ELASTIC_ALERTS_INDEX || '*alerts-*';
   private readonly ELASTIC_ALERTERS_INDEX_NAME = process.env.KIBA_INDEX_PREFIX + '-alerters';
   private readonly FRONTEND_NODE = process.env.FRONTEND_NODE || 'http://frontend:3000';
   private readonly ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || undefined; // Clé de chiffrement par défaut
+  private intervalId: NodeJS.Timeout | null = null;
   private notifiedAlerts = new Set<string>();
-  private isFirstRun = true; // <-- Ajout
+  private isFirstRun = true;
+  private pausedUntil: Date | null = null;
+
+  public muted = false;
 
   constructor(
     private readonly discordService: DiscordService,
@@ -43,18 +32,77 @@ export class WorkersService implements OnModuleInit {
     private readonly cryptService: CryptService,
     private readonly indexService: IndexService,
     private readonly telegramService: TelegramService,
-  ) { }
+  ) {}
+
+ private state: "running" | "paused" | "stopped" = "stopped";
 
   onModuleInit() {
-    this.logger.log('🚀 Worker Alerts démarré');
-    setInterval(() => {
-      this.pollAlerts();
-    }, this.INTERVAL);
+    this.logger.log("🚀 WorkersService initialized");
+    this.start(); // démarre par défaut
   }
 
+  /** Lance le worker */
+  start() {
+    if (this.state === "running") {
+      this.logger.warn("⚠️ Worker already running.");
+      return;
+    }
+    this.logger.log("▶️ Starting worker...");
+    this.intervalId = setInterval(() => this.pollAlerts(), this.INTERVAL);
+    this.state = "running";
+    this.pausedUntil = null;
+  }
+
+  /** Arrête complètement le worker (même si en pause) */
+  stop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    this.state = "stopped";
+    this.pausedUntil = null;
+    this.logger.log("⏹ Worker stopped.");
+  }
+
+  /** Pause pendant X minutes */
+  pause(minutes: number) {
+    if (this.state !== "stopped") {
+      this.stop(); // arrête l’interval
+
+    }
+    this.pausedUntil = new Date(Date.now() + minutes * 60 * 1000);
+    this.state = "paused";
+    this.logger.log(`⏸ Worker paused until ${this.pausedUntil.toISOString()}`);
+
+    setTimeout(() => {
+      if (this.state === "paused" && this.pausedUntil && new Date() >= this.pausedUntil) {
+        this.logger.log("🔄 Resuming worker after pause...");
+        this.start();
+      }
+    }, minutes * 60 * 1000);
+  }
+
+  /** Vérifie si en pause */
+  isPaused(): boolean {
+    return this.state === "paused";
+  }
+
+  getStatus() {
+    return {
+      state: this.state,
+      running: this.state === "running",
+      paused: this.state === "paused",
+      pausedUntil: this.pausedUntil,
+    };
+  }
   async pollAlerts() {
+    if (this.isPaused()) {
+      this.logger.debug('⏸ Worker is paused, skipping poll.');
+      return;
+    }
     try {
-      this.logger.debug("👉 polling alerts...");
+      this.logger.debug('👉 polling alerts...');
+
 
       const alerts = await this.indexService.findAllDocuments(this.ELASTIC_ALERTS_INDEX);
 

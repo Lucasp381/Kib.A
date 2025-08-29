@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton"; // ajoute ça en haut
+import WorkerControl from "@/components/worker/WorkerControl";
 
 const geistSans = localFont({
   src: [
@@ -142,45 +143,46 @@ export default function RootLayout({
                       Kibana Alert Management
                     </small>
                   </div>
-                  <div className=" gap-2">
-                    <div className="grid grid-cols-2 w-20 items-center">
-                      <small className="w-20 text-sm text-main-600 font-bold first-letter:text-red-600">Elastic</small>
-                      {esStatus ? (
-                        <span className=" flex items-center justify-center">
-                          {esStatus?.status === "green" ? (
-                            <div className=" bg-green-500 size-3 rounded-full border-1 m-0 p-0" />
-                          ) : esStatus?.status === "yellow" ? (
-                            <div className=" bg-yellow-500 size-3 rounded-full border-1 m-0 p-0" />
-                          ) : (
-                            <div className=" bg-red-500 size-3 rounded-full border-1 m-0 p-0" />
-                          )}
-                        </span>
-                      ) : (
-                        <span className=" flex items-center justify-center">
-                          <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 w-20 items-center ">
-                      <CardTitle className="text-sm font-bold text-main-600 first-letter:text-red-600">Kibana</CardTitle>
-                      {kibanaStatus ? (
-                        <span className="flex items-center justify-center">
-                          {kibanaStatus?.status?.overall?.level === "available" ? (
-                            <span className="bg-green-500  size-3 rounded-full border inline-block" />
-                          ) : kibanaStatus?.status?.overall?.level === "degraded" ? (
-                            <span className="bg-yellow-500 size-3 rounded-full border inline-block" />
-                          ) : (
-                            <span className="bg-red-500 size-3 rounded-full border inline-block" />
-                          )}
-                        </span>
-                      ) : (
-                        <span className=" flex items-center justify-center">
-                          <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
-                        </span>
-                      )}
-                    </div>
+                  <WorkerControl />
+                    <div className=" gap-2">
+                      <div className="grid grid-cols-2 w-20 items-center">
+                        <small className="w-20 text-sm text-main-600 font-bold first-letter:text-red-600">Elastic</small>
+                        {esStatus ? (
+                          <span className=" flex items-center justify-center">
+                            {esStatus?.status === "green" ? (
+                              <div className=" bg-green-500 size-3 rounded-full border-1 m-0 p-0" />
+                            ) : esStatus?.status === "yellow" ? (
+                              <div className=" bg-yellow-500 size-3 rounded-full border-1 m-0 p-0" />
+                            ) : (
+                              <div className=" bg-red-500 size-3 rounded-full border-1 m-0 p-0" />
+                            )}
+                          </span>
+                        ) : (
+                          <span className=" flex items-center justify-center">
+                            <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
+                          </span>
+                        )}
+                      </div>
 
-                  </div>
+                      <div className="grid grid-cols-2 w-20 items-center ">
+                        <CardTitle className="text-sm font-bold text-main-600 first-letter:text-red-600">Kibana</CardTitle>
+                        {kibanaStatus ? (
+                          <span className="flex items-center justify-center">
+                            {kibanaStatus?.status?.overall?.level === "available" ? (
+                              <span className="bg-green-500  size-3 rounded-full border inline-block" />
+                            ) : kibanaStatus?.status?.overall?.level === "degraded" ? (
+                              <span className="bg-yellow-500 size-3 rounded-full border inline-block" />
+                            ) : (
+                              <span className="bg-red-500 size-3 rounded-full border inline-block" />
+                            )}
+                          </span>
+                        ) : (
+                          <span className=" flex items-center justify-center">
+                            <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
+                          </span>
+                        )}
+                      </div>
+                    </div>
                 </>
               )}
             </header>
