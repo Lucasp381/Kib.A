@@ -21,8 +21,7 @@ export async function GET(
             return NextResponse.json({ error: 'Failed to create Slack client' }, { status: 500 });
         }
         console.log("Fetching Slack channels with name:", name);
-        const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel' });
-        console.log("Slack conversations list response:", conversationsList);
+        const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel' , limit: 1000 });
         if (!conversationsList.ok) {
             return NextResponse.json({ error: `Slack API error: ${conversationsList.error}` }, { status: 500 });
         }

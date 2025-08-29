@@ -107,6 +107,10 @@ ELASTIC_API_KEY='API-KEY-HERE' # Replace with your actual API key
 KIBA_INDEX_PREFIX="kiba" # Prefix for Kib.A indices allow multiple instances
 POLL_EVERY=10 # Time in seconds to poll Elasticsearch for new alerts
 ENCRYPTION_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=" # Encryption key for sensitive data ( openssl  rand -base64 32 )
+
+# Insecure option, not recommended in production :
+ELASTIC_TLS_REJECT_UNAUTHORIZED=false
+NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
 
@@ -133,10 +137,14 @@ http://localhost:8080
 **Slack**:
 - Require Slack Apps token
 - Permissions:
-  - channels:read
-  - chat:write
-  - chat:write.public
-  - 
+  - Public channels:     
+    - channels:read
+    - chat:write
+    - chat:write.public
+  - Privates channels:
+    - groups:write
+    - groups:read
+      
 **Teams**:
 - Webook url
 
