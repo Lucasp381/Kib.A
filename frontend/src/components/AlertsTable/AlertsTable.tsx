@@ -108,7 +108,7 @@ export default function AlertsTable({ pageSize = 15, refreshIntervalMs = 5000 }:
       </ScrollArea>
 
       {/* Pagination */}
-      <div className="flex justify-left align-middle mt-4 space-x-2">
+      <div className="flex justify-center align-middle mt-4 space-x-2">
         <Button disabled={page <= 1} onClick={() => setPage(page - 1)} className="btn-color">
           <span className="select-none">Previous</span>
         </Button>

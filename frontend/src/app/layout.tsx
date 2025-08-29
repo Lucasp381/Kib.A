@@ -128,6 +128,7 @@ export default function RootLayout({
             {/* Header en haut, sur toute la largeur */}
             <header className="sticky top-0 z-50 col-span-2 flex items-center justify-between bg-card border-b border-gray-200 dark:border-gray-700 p-4 shadow-md">
               {showLabel && (
+                
                 <>
                   <a className="inline items-center gap-2" href="/">
                     <h1 className="font-extrabold text-4xl text-main-600 ml-20">
@@ -136,7 +137,7 @@ export default function RootLayout({
                     <small className="flex ml-20 text-sm text-muted-foreground">
                       Kibana Alert Management
                     </small>
-                  </div>
+                  </a>
                   <WorkerControl />
                     <div className=" gap-2">
                       <div className="grid grid-cols-2 w-20 items-center">
