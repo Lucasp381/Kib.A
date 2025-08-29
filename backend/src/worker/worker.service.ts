@@ -15,7 +15,6 @@ export class WorkersService implements OnModuleInit {
     process.env.POLL_EVERY ? parseInt(process.env.POLL_EVERY) * 1000 : 10000;
   private readonly ELASTIC_ALERTS_INDEX = process.env.ELASTIC_ALERTS_INDEX || '*alerts-*';
   private readonly ELASTIC_ALERTERS_INDEX_NAME = process.env.KIBA_INDEX_PREFIX + '-alerters';
-  private readonly FRONTEND_NODE = process.env.FRONTEND_NODE || 'http://frontend:3000';
   private readonly ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || undefined; // Clé de chiffrement par défaut
   private intervalId: NodeJS.Timeout | null = null;
   private notifiedAlerts = new Set<string>();
@@ -104,14 +103,14 @@ export class WorkersService implements OnModuleInit {
       this.logger.debug('👉 polling alerts...');
 
 
-      const alerts = await this.indexService.findAllDocuments(this.ELASTIC_ALERTS_INDEX);
+      const alerts = await this.indexService.findAllDocuments(this.ELASTIC_ALERTS_INDEX, 1000);
 
       this.logger.debug("✅ fetch done");
 
-      if (!Array.isArray(alerts)) return;
+      if (!Array.isArray(alerts.data)) return;
 
-      const activeAlerts = alerts.filter(a => a._source?.['kibana.alert.status'] === 'active');
-      const recoveredAlerts = alerts.filter(a => a._source?.['kibana.alert.status'] === 'recovered');
+      const activeAlerts = alerts.data.filter(a => a._source?.['kibana.alert.status'] === 'active');
+      const recoveredAlerts = alerts.data.filter(a => a._source?.['kibana.alert.status'] === 'recovered');
 
       for (const alert of activeAlerts) {
         if (!alert._id) continue;
@@ -145,7 +144,7 @@ export class WorkersService implements OnModuleInit {
         }
       }
 
-      const currentIds = new Set(alerts.map(a => a._id));
+      const currentIds = new Set(alerts.data.map(a => a._id));
       for (const id of Array.from(this.notifiedAlerts)) {
         if (!currentIds.has(id)) {
           this.notifiedAlerts.delete(id);
@@ -167,9 +166,9 @@ export class WorkersService implements OnModuleInit {
   private async sendNotification(alert, ruleId: string, status: 'active' | 'recovered' | 'flapping') {
 
     const alerters = await this.indexService.findAllDocuments(this.ELASTIC_ALERTERS_INDEX_NAME);
-    if (!Array.isArray(alerters)) return;
+    if (!Array.isArray(alerters.data)) return;
 
-    for (const alerter of alerters as any[]) {
+    for (const alerter of alerters.data as any[]) {
       if (alerter._source?.rules?.some((r) => r.id === ruleId) || alerter._source?.all_rules) {
         try {
 
