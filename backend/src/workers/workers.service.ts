@@ -143,7 +143,6 @@ export class WorkersService implements OnModuleInit {
             message = alerter._source?.config.recoveredMessageTemplate || `✅ Alert recovered: ${alert._source['kibana.alert.rule.name'] || ruleId}`;
             subject = alerter._source?.config.recoveredSubjectTemplate || '[Kib.A] Alert Notification';
           }
-
           switch (alerter._source?.type) {
             case 'discord':
               // Discord: channelId and token can be encrypted
@@ -196,6 +195,7 @@ export class WorkersService implements OnModuleInit {
                 username = await this.cryptService.decrypt(alerter._source?.config.username, this.ENCRYPTION_KEY);
                 password = await this.cryptService.decrypt(alerter._source?.config.password, this.ENCRYPTION_KEY);
               }
+
               await this.emailService.sendEmailMessage(
                 alerter._source?.config.smtp_server,
                 Number(alerter._source?.config.port),
@@ -204,7 +204,7 @@ export class WorkersService implements OnModuleInit {
                 alerter._source?.config.from_address,
                 alerter._source?.config.to_addresses.split(",").map((addr: string) => addr.trim()),
                 alerter._source?.config.cc_addresses ? alerter._source?.config.cc_addresses.split(",").map((addr: string) => addr.trim()) : [],
-                alerter._source?.config.subject || '[Kib.A] Notification',
+                subject || '[Kib.A] Notification',
                 message,
                 alert
               );
