@@ -7,7 +7,7 @@ export async function GET(
 
 ) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
   const kibanaUrl = process.env.KIBANA_URL || 'http://127.0.0.1:5601';
   const apiKey = process.env.ELASTIC_API_KEY;
@@ -27,6 +27,7 @@ export async function GET(
     });
     
     clearTimeout(timeout);
+
     if (!res.ok) {
       console.error('Error fetching status:', res);
       return NextResponse.json({ error: 'Failed to fetch status' }, { status: 500 });

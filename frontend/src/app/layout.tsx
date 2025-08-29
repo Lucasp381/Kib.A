@@ -71,11 +71,9 @@ export default function RootLayout({
         const data = await response.json();
         setEsStatus(data);
         if (!data.status) {
-          setEsStatus(null);
           setEsError(data.error || "");
         }
       } catch (error) {
-        setEsStatus(null);
         setEsError((error as Error).message);
         console.log("Es error:", (error as Error).message);
       }
@@ -87,13 +85,12 @@ export default function RootLayout({
         const data = await response.json();
         setKibanaStatus(data);
         if (!data.status) {
-          setKibanaStatus(null);
           setKibanaError(data.error == "This operation was aborted" ? "Kibana doesn't answer in time" : data.error);
         }
 
       } catch (error) {
         console.error("Error fetching Kibana status:", error);
-        setKibanaStatus(null);
+        
         setKibanaError((error as Error).message);
         console.log("Kibana error:", error);
       }
@@ -189,7 +186,7 @@ export default function RootLayout({
                 <Skeleton className="w-[80%] h-[50%] rounded-xl" />
                 <Skeleton className="w-[80%] h-80 rounded-xl" />
               </div>
-            ) : esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available" ? (
+            ) :  esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available"  ? (
               // Bloc d'erreur si ES ou Kibana est indisponible
               <Custom503 error={[esError, kibanaError]} />
             ) : (
