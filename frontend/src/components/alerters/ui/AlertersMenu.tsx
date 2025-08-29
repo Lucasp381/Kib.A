@@ -41,18 +41,18 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                 switch (type) {
                                     case "email":
                                         const emailConfig = alerter.config as EmailAlerter["config"];
-                                        return <small className="text-xs text-main-900 overflow-hidden ">{emailConfig.from_address}</small>;
+                                        return <small className="text-xs text-main-900 dark:text-white overflow-hidden ">{emailConfig.from_address}</small>;
                                     case "discord":
                                         const discordConfig = alerter.config as DiscordAlerter["config"];
                                         { discordConfig.channelName ? (
-                                            <small className="text-xs text-main-900 overflow-hidden">{discordConfig.channelName}</small>
+                                            <small className="text-xs text-main-900 dark:text-white overflow-hidden">{discordConfig.channelName}</small>
                                         ) : null }
                                     case "slack":
                                         const slackConfig = alerter.config as SlackAlerter["config"];
-                                        return <small className="text-xs text-main-900 overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
+                                        return <small className="text-xs text-main-900 dark:text-white overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
                                     case "teams":
                                         const teamsConfig = alerter.config as TeamsAlerter["config"];
-                                        { alerter ? <small className="text-xs text-main-900 overflow-hidden">ddd</small> : null }
+                                        { alerter ? <small className="text-xs text-main-900 dark:text-white overflow-hidden">ddd</small> : null }
                                     default:
                                         return null;
                                 }

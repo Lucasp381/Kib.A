@@ -33,7 +33,19 @@ export class IndexService {
       this.logger.error('Failed to fetch variables');
       throw new HttpException('Failed to fetch variables', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return res.hits.hits;
+    const totalHits =
+      typeof res.hits.total === 'number' ? res.hits.total : res.hits.total?.value;
+
+      if(!totalHits) {
+        return { data: [], total: 0, page, pageSize: limit, totalPages: 0 }
+      }
+    return {
+      data: res.hits.hits,
+      total: totalHits,
+      page,
+      pageSize: limit,
+      totalPages: Math.ceil(totalHits / limit),
+    }
 
 
   }

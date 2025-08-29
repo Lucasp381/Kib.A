@@ -11,24 +11,10 @@ import AlertsTable from "@/components/AlertsTable/AlertsTable";
 
 
 export default function DashboardPage() {
-    const [alerts, setAlerts] = useState([]);
-    const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
-    useEffect(() => {
-        fetch("/api/backend/elastic/index/documents?index=*alerts-*")
-            .then((res) => res.json())
-            .then((result) => {
-                setAlerts(result);
-            });
 
-    }, []);
 
-    useEffect(() => {
-        fetch("/api/kibana/rules")
-            .then((res) => res.json())
-            .then((data) => {
-                setRules(data.data);
-            });
-    }, []);
+
+
 
     const cardClass = "p-6 border-none  border-blue-300 shadow-none rounded-none bg-herit pb-0 max-h-[80vh]";
     const cardTitleClass = "text-xl font-bold mb-0";
@@ -41,11 +27,9 @@ export default function DashboardPage() {
                     Here you can view the latest alerts from your Kibana instance.
                 </CardDescription>
                 
-                { alerts && alerts.length > 0 ? (
+
                 <AlertsTable pageSize={10}/>
-                ) : (
-                    <div className="text-center text-gray-500">No alerts found.</div>
-                )}
+               
                
             </Card>
             <Separator />
@@ -56,12 +40,9 @@ export default function DashboardPage() {
                         <CardDescription className="text-main-500">
                             Here you can view the latest rules from your Kibana instance.
                         </CardDescription>
-                    {rules && rules.length > 0 ? (
+                   
                     <RulesTable  />
-                    ) : (
-                    <div className="text-center text-gray-500">No rules found.</div>
-                    )}
-                    
+                   
                 
                     </>
 

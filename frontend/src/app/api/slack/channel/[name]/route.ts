@@ -22,6 +22,7 @@ export async function GET(
         }
         console.log("Fetching Slack channels with name:", name);
         const conversationsList = await client.conversations.list({ types: 'public_channel,private_channel' });
+        console.log("Slack conversations list response:", conversationsList);
         if (!conversationsList.ok) {
             return NextResponse.json({ error: `Slack API error: ${conversationsList.error}` }, { status: 500 });
         }

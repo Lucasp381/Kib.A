@@ -33,7 +33,7 @@ export default  function AlertsTable({ pageSize = 15 }: AlertsTableProps) {
     
 
     const res = await fetch(
-      `/api/elastic/index?index=*alerts-*&limit=${pageSize}&page=${page}&FieldMustExist=kibana.alert.rule.uuid`,
+      `/api/backend/elastic/index/documents?index=*alerts-*&limit=${pageSize}&page=${page}`,
     );
     const result = await res.json();
     setAlerts(result.data);
