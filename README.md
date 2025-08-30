@@ -26,10 +26,16 @@ This is a early stage of the project, so there are still bugs and issues.
 - 🚨 **Teams Alerters** ([Webhook](https://learn.microsoft.com/fr-fr/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) & [AdaptiveCards](https://adaptivecards.microsoft.com/designer))
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
+- ⏱️ **Start/Pause/Stop notifications globally**
 
-<p align="center">
-  <img src="github/emoji-placeholders.gif" />
+<p align="center" >
+  <img src="https://github.com/user-attachments/assets/678a0251-0bae-4513-bb2b-86bd5e774756" width="800" />
+  <img src="https://github.com/user-attachments/assets/0bbd0033-762f-4967-a7e6-67578cfec08f" width="800" />
+  <img src="https://github.com/user-attachments/assets/d0f6b7e8-93f9-4e47-a41c-1b03025d2666" width="800" />
 </p>
+
+
+
 
  
 ---
@@ -154,7 +160,12 @@ http://localhost:8080
 
 ## Tips
 - You can add `KIBANA_URL` variable in settings > Variables to be able to double click on alerts and rules in the Dashboard
-
+- You can pause programatically the notifications :
+```curl
+curl 'http://127.0.0.1:3000/api/backend/worker/pause' \
+  -H 'Content-Type: application/json' \
+  --data-raw '{"minutes":5}'
+```
 ## 🛠 Tech Stack
 
 - [NestJS](https://nestjs.com/) – Backend  
