@@ -26,6 +26,7 @@ This is a early stage of the project, so there are still bugs and issues.
 - 🚨 **Teams Alerters** ([Webhook](https://learn.microsoft.com/fr-fr/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) & [AdaptiveCards](https://adaptivecards.microsoft.com/designer))
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
+- ⏱️ **Start/Pause/Stop notifications globally**
 
 <p align="center">
   <img src="github/emoji-placeholders.gif" />
