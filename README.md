@@ -28,9 +28,15 @@ This is a early stage of the project, so there are still bugs and issues.
 - 🖍️ **Rule selection**
 - ⏱️ **Start/Pause/Stop notifications globally**
 
-<p align="center">
-  <img src="github/emoji-placeholders.gif" />
+<p align="center" >
+  <img src="https://github.com/user-attachments/assets/37f2941a-ec9e-4ab1-b33f-ea19454358fd" width="800" />
+  <img src="https://github.com/user-attachments/assets/0bbd0033-762f-4967-a7e6-67578cfec08f" width="800" />
+
+  <img src="https://github.com/user-attachments/assets/d0f6b7e8-93f9-4e47-a41c-1b03025d2666" width="800" />
 </p>
+
+
+
 
  
 ---
