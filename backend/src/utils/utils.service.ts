@@ -53,7 +53,7 @@ async replacePlaceholders(template: string, data: any) {
     const logEntry = {
       message,
       meta,
-      timestamp: new Date().toISOString(),
+      "@timestamp": new Date().toISOString(),
     };
     // Envoyer le log à Elasticsearch
     await this.indexService.index(this.HISTORY_INDEX, logEntry);

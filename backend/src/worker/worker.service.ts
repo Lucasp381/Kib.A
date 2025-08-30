@@ -210,9 +210,9 @@ export class WorkersService implements OnModuleInit {
                   message,
                   alert
                 );
-                this.utilsService.esLoggingHistory(`Discord message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Discord message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               } catch (error) {
-                this.utilsService.esLoggingHistory(`Discord message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Discord message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               }
               break; // Sortie du switch après envoi Discord
             case 'slack':
@@ -230,9 +230,9 @@ export class WorkersService implements OnModuleInit {
                   message,
                   alert
                 );
-                this.utilsService.esLoggingHistory(`Slack message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Slack message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               } catch (error) {
-                this.utilsService.esLoggingHistory(`Slack message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Slack message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               }
               break;
 
@@ -247,9 +247,9 @@ export class WorkersService implements OnModuleInit {
                 isAdaptiveCard,
                 alert
               );
-              this.utilsService.esLoggingHistory(`Teams message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              this.utilsService.esLoggingHistory(`Teams message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               } catch (error) {
-                this.utilsService.esLoggingHistory(`Teams message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Teams message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               }
               break;
             case 'email':
@@ -273,9 +273,9 @@ export class WorkersService implements OnModuleInit {
                 message,
                 alert
               );
-              this.utilsService.esLoggingHistory(`Email message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              this.utilsService.esLoggingHistory(`Email message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               } catch (error) {
-                this.utilsService.esLoggingHistory(`Email message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Email message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               }
               break;
             case 'telegram':
@@ -291,9 +291,9 @@ export class WorkersService implements OnModuleInit {
                   message,
                   alert
                 );
-                this.utilsService.esLoggingHistory(`Telegram message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Telegram message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               } catch (error) {
-                this.utilsService.esLoggingHistory(`Telegram message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+                this.utilsService.esLoggingHistory(`Telegram message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name, type: alerter._source?.type }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
               }
               break;
 

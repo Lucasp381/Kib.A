@@ -2,7 +2,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { Switch } from "@/components/ui/switch";
-import { Home, Settings, Send} from "lucide-react";
+import { Home, Settings, Send, History} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { MenuButton } from "@/components/menu/menuButton";
@@ -53,6 +53,7 @@ const menuItems = [
   //{ href: "/alerts", label: "Alerts", icon: <Bell className="w-5 h-5 fill-main-500" /> },
   //{ href: "/rules", label: "Rules", icon: <Cctv className="w-5 h-5 fill-main-500" /> },
   { href: "/alerters", label: "Alerters", icon: <Send className="w-5 h-5 fill-main-500" /> },
+  { href: "/history", label: "History", icon: <History className="w-5 h-5 fill-main-500" /> },
   { href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 fill-main-500" /> },
 ];
 
@@ -187,16 +188,13 @@ export default function RootLayout({
 
             {/* Si status kibana ou elastic red, on affiche rien */}
             {esStatus === null || kibanaStatus === null ? (
-              // Skeleton si un service n'est pas encore chargé
               <div className="w-screen h-screen flex flex-col items-center justify-center gap-4">
                 <Skeleton className="w-[80%] h-[50%] rounded-xl" />
                 <Skeleton className="w-[80%] h-80 rounded-xl" />
               </div>
             ) :  esStatus?.status !== "green" && esStatus?.status !== "yellow" || kibanaStatus?.status?.overall?.level !== "available"  ? (
-              // Bloc d'erreur si ES ou Kibana est indisponible
               <Custom503 error={[esError, kibanaError]} />
             ) : (
-              // Sinon, on affiche le contenu normal
               <div className="grid col-span-2 grid-cols-[auto_1fr] h-[calc(100vh-93px)]">
                 {/* Sidebar + children */}
                 <Card

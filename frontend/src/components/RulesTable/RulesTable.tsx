@@ -109,7 +109,7 @@ export default function RulesTable({ pageSize = 10 }: RulesTableProps) {
           </TableBody>
         </Table>
         {/* Pagination */}
-        <div className="flex justify-center align-middle mt-4 space-x-2">
+        <div className="flex space-x-2 justify-center  mt-5 pr-[250px]">
           <Button disabled={page <= 1} onClick={() => setPage(page - 1)} className="btn-color">
             <span className="select-none">Previous</span>
           </Button>

@@ -13,6 +13,7 @@ export class IndexService {
   }
 
 
+
   async findAllDocuments(index: string, limit: number = 1000, page: number = 1,  FieldMustExist: string | null = null) {
     let query: estypes.QueryDslQueryContainer;
     if (FieldMustExist) {
