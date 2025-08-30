@@ -9,7 +9,6 @@ import {
   ContextMenuSub
 } from "@/components/ui/context-menu";
 import { ContextMenuSubContent } from "@/components/ui/context-menu";
-import { emojiMap } from "@/lib/EmojiMap";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { rulesPlaceholders } from "@/lib/RulesPlaceholders";
 

@@ -21,7 +21,6 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
 import { Card, CardContent } from "@/components/ui/card"
 import EditButton from "@/components/alerters/ui/EditButton"; // Assurez-vous que ce composant existe
 import { Alerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement

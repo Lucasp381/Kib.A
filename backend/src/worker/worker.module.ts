@@ -8,10 +8,11 @@ import { CryptModule } from 'src/crypt/crypt.module'; // Import the CryptModule
 import { IndexModule } from 'src/elastic/index/index.module'; // Import the IndexModule
 import { TelegramModule } from 'src/alerters/telegram/telegram.module';
 import { WorkersController } from './worker.controller';
+import { UtilsModule } from 'src/utils/utils.module';
 
 @Module({
     controllers: [WorkersController],
-  imports: [DiscordModule, SlackModule, TeamsModule, EmailModule, CryptModule, IndexModule, TelegramModule],
+  imports: [DiscordModule, SlackModule, TeamsModule, EmailModule, CryptModule, IndexModule, TelegramModule, UtilsModule],
   providers: [WorkersService],
 })
 export class WorkerModule {}

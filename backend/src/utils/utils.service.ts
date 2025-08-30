@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-
+import { ElasticsearchService } from 'src/clients/elasticsearch.service';
 @Injectable()
 export class UtilsService {
+    constructor(private readonly indexService: ElasticsearchService) {}
+    private HISTORY_INDEX = process.env.KIBA_INDEX_PREFIX + '-history';
     public  getValue(obj: any, path: string) {
         if (obj == null) return undefined;
     
@@ -46,5 +48,14 @@ async replacePlaceholders(template: string, data: any) {
       const value = this.getValue(alert, key);
       return value !== undefined ? String(value) : `{alert.${key}}`;
     });
+  }
+  async esLoggingHistory( message: string, meta: any = {}) {
+    const logEntry = {
+      message,
+      meta,
+      timestamp: new Date().toISOString(),
+    };
+    // Envoyer le log à Elasticsearch
+    await this.indexService.index(this.HISTORY_INDEX, logEntry);
   }
 }

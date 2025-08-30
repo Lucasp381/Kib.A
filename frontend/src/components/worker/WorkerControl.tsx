@@ -11,6 +11,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 type WorkerStatus = {
@@ -22,14 +23,21 @@ type WorkerStatus = {
 export default function WorkerStatusMini() {
   const [status, setStatus] = useState<WorkerStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [remaining, setRemaining] = useState<number | null>(null); 
 
-  // Fetch status function
   async function fetchStatus(initialLoad = false) {
     try {
       if (initialLoad) setLoading(true);
       const res = await fetch("/api/backend/worker/status");
       const data = await res.json();
       setStatus(data);
+
+      if (data.pausedUntil) {
+        const ms = new Date(data.pausedUntil).getTime() - Date.now();
+        setRemaining(Math.max(Math.ceil(ms / 1000), 0));
+      } else {
+        setRemaining(null);
+      }
     } catch (err) {
       console.error("Erreur fetch status:", err);
     } finally {
@@ -37,7 +45,6 @@ export default function WorkerStatusMini() {
     }
   }
 
-  // Action function
   async function action(endpoint: string, body?: object) {
     try {
       await fetch(`/api/backend/worker/${endpoint}`, {
@@ -45,19 +52,40 @@ export default function WorkerStatusMini() {
         headers: { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined,
       });
-      await fetchStatus(); // refresh status after action
+      await fetchStatus(true); 
     } catch (err) {
       console.error("Erreur action:", err);
     }
   }
 
-  useEffect(() => {
-    // premier chargement avec loader
-    fetchStatus(true);
-    // refresh toutes les 5s silencieux
-    const interval = setInterval(() => fetchStatus(false), 5000);
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  fetchStatus(true);
+
+
+  const interval = setInterval(() => {
+    setRemaining((prev) => {
+      if (prev === null) return null;
+
+      const next = Math.max(prev - 1, 0);
+
+
+      if (next === 0) {
+        fetchStatus(false);
+      }
+
+      return next;
+    });
+  }, 1000);
+
+ 
+  const syncInterval = setInterval(() => fetchStatus(false), 5000);
+
+  return () => {
+    clearInterval(interval);
+    clearInterval(syncInterval);
+  };
+}, []);
+
 
   if (loading || !status) {
     return (
@@ -80,30 +108,29 @@ export default function WorkerStatusMini() {
     ? "Running"
     : "Stopped";
 
+  function formatRemaining(seconds: number) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h > 0 ? `${h}h` : "", m > 0 ? `${m}m` : "", `${s}s`]
+      .filter(Boolean)
+      .join(" ");
+  }
+
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="flex">
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-min-32 h-8 select-none"
         >
           <span className={`w-2 h-2 rounded-full ${color}`} />
-          {status.pausedUntil ? (
+          {status.pausedUntil && remaining !== null ? (
             <div className="items-start text-left">
               <span>{text}</span>
               <small className="text-xs text-muted-foreground ml-2">
-                {(() => {
-                  const ms = new Date(status.pausedUntil).getTime() - new Date().getTime();
-                  if (ms <= 0) return "0s";
-                  const totalSeconds = Math.ceil(ms / 1000);
-                  const hours = Math.floor(totalSeconds / 3600);
-                  const minutes = Math.floor((totalSeconds % 3600) / 60);
-                  const seconds = totalSeconds % 60;
-                  return [hours > 0 ? `${hours}h` : "", minutes > 0 ? `${minutes}m` : "", `${seconds}s`]
-                    .filter(Boolean)
-                    .join(" ");
-                })()}
+                {formatRemaining(remaining)}
               </small>
             </div>
           ) : (
@@ -129,6 +156,23 @@ export default function WorkerStatusMini() {
                 Pause {m < 60 ? `${m}m` : "1h"}
               </DropdownMenuItem>
             ))}
+            <DropdownMenuItem key="custom"  onClick={(e) => {e.preventDefault();}} onPointerMove={(e) => {e.preventDefault();}} onPointerLeave={(e) => {e.preventDefault();}} onPointerOut={(e) => {e.preventDefault();}}>
+              <Input
+                type="number"
+                min={1}
+                placeholder="X minutes"
+                className="p-1 m-0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const minutes = parseInt((e.target as HTMLInputElement).value);
+                    if (!isNaN(minutes)) {
+                      action("pause", { minutes });
+                    }
+                  }
+                }}
+              />
+
+            </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>

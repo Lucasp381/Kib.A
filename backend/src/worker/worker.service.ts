@@ -7,7 +7,7 @@ import { EmailService } from 'src/alerters/email/email.service';
 import { TelegramService } from 'src/alerters/telegram/telegram.service';
 import { CryptService } from 'src/crypt/crypt.service';
 import { IndexService } from 'src/elastic/index/index.service';
-
+import { UtilsService } from 'src/utils/utils.service';
 @Injectable()
 export class WorkersService implements OnModuleInit {
   private readonly logger = new Logger(WorkersService.name);
@@ -20,6 +20,7 @@ export class WorkersService implements OnModuleInit {
   private notifiedAlerts = new Set<string>();
   private isFirstRun = true;
   private pausedUntil: Date | null = null;
+  private suppressedAlerts = new Set<string>();
 
   public muted = false;
 
@@ -31,16 +32,16 @@ export class WorkersService implements OnModuleInit {
     private readonly cryptService: CryptService,
     private readonly indexService: IndexService,
     private readonly telegramService: TelegramService,
-  ) {}
+    private readonly utilsService: UtilsService,
+  ) { }
 
- private state: "running" | "paused" | "stopped" = "stopped";
+  private state: "running" | "paused" | "stopped" = "stopped";
 
   onModuleInit() {
     this.logger.log("🚀 WorkersService initialized");
-    this.start(); // démarre par défaut
+    this.start();
   }
 
-  /** Lance le worker */
   start() {
     if (this.state === "running") {
       this.logger.warn("⚠️ Worker already running.");
@@ -52,7 +53,6 @@ export class WorkersService implements OnModuleInit {
     this.pausedUntil = null;
   }
 
-  /** Arrête complètement le worker (même si en pause) */
   stop() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
@@ -63,25 +63,24 @@ export class WorkersService implements OnModuleInit {
     this.logger.log("⏹ Worker stopped.");
   }
 
-  /** Pause pendant X minutes */
   pause(minutes: number) {
-    if (this.state !== "stopped") {
-      this.stop(); // arrête l’interval
 
-    }
+
     this.pausedUntil = new Date(Date.now() + minutes * 60 * 1000);
     this.state = "paused";
     this.logger.log(`⏸ Worker paused until ${this.pausedUntil.toISOString()}`);
 
+    // Remise à running automatique après la pause
     setTimeout(() => {
       if (this.state === "paused" && this.pausedUntil && new Date() >= this.pausedUntil) {
         this.logger.log("🔄 Resuming worker after pause...");
-        this.start();
+        this.state = "running"; // ne pas appeler start(), le worker est déjà actif
+        this.pausedUntil = null;
       }
-    }, minutes * 60 * 1000);
+    }, minutes * 60 * 1000 + 1000);
   }
 
-  /** Vérifie si en pause */
+
   isPaused(): boolean {
     return this.state === "paused";
   }
@@ -95,23 +94,17 @@ export class WorkersService implements OnModuleInit {
     };
   }
   async pollAlerts() {
-    if (this.isPaused()) {
-      this.logger.debug('⏸ Worker is paused, skipping poll.');
-      return;
-    }
     try {
-      this.logger.debug('👉 polling alerts...');
-
-
+      this.logger.debug("🔄 Polling for alerts...");
       const alerts = await this.indexService.findAllDocuments(this.ELASTIC_ALERTS_INDEX, 1000);
-
-      this.logger.debug("✅ fetch done");
-
       if (!Array.isArray(alerts.data)) return;
 
       const activeAlerts = alerts.data.filter(a => a._source?.['kibana.alert.status'] === 'active');
       const recoveredAlerts = alerts.data.filter(a => a._source?.['kibana.alert.status'] === 'recovered');
 
+      const paused = this.state === "paused";
+
+      // Active alerts
       for (const alert of activeAlerts) {
         if (!alert._id) continue;
         const ruleId = alert._source?.['kibana.alert.rule.uuid'];
@@ -120,15 +113,17 @@ export class WorkersService implements OnModuleInit {
         if (!this.notifiedAlerts.has(alert._id)) {
           this.notifiedAlerts.add(alert._id);
 
-          // Si premier run, on n'envoie pas de notification
-          if (!this.isFirstRun) {
-            console.log("Sending notification for alert");
+          if (paused) {
+            this.logger.debug(`🔇 Worker paused, suppressing notification for alert ${alert._id}`);
+            this.suppressedAlerts.add(alert._id);
+          } else if (!this.isFirstRun) {
+            this.logger.debug(`🔔 Sending notification for alert ${alert._id}`);
             await this.sendNotification(alert, ruleId, 'active');
-
           }
         }
       }
 
+      // Recovered alerts
       for (const alert of recoveredAlerts) {
         if (!alert._id) continue;
         const ruleId = alert._source?.['kibana.alert.rule.uuid'];
@@ -137,13 +132,19 @@ export class WorkersService implements OnModuleInit {
         if (this.notifiedAlerts.has(alert._id)) {
           this.notifiedAlerts.delete(alert._id);
 
-          // Si premier run, on n'envoie pas de notification
-          if (!this.isFirstRun) {
+          // Notification only if not suppressed
+          if (!this.suppressedAlerts.has(alert._id) && !this.isFirstRun && this.state === "running") {
+            this.logger.debug(`🔔 Sending notification for alert ${alert._id}`);
+
             await this.sendNotification(alert, ruleId, 'recovered');
+          } else {
+            this.logger.debug(`🔇 Suppressing notification for alert ${alert._id}`);
+            this.suppressedAlerts.delete(alert._id);
           }
         }
       }
 
+      // Cleanup
       const currentIds = new Set(alerts.data.map(a => a._id));
       for (const id of Array.from(this.notifiedAlerts)) {
         if (!currentIds.has(id)) {
@@ -152,7 +153,6 @@ export class WorkersService implements OnModuleInit {
         }
       }
 
-      // Après premier cycle complet, désactive le flag
       if (this.isFirstRun) {
         this.isFirstRun = false;
         this.logger.log("✅ First run completed, notifications will now be sent.");
@@ -162,6 +162,9 @@ export class WorkersService implements OnModuleInit {
       this.logger.error('Erreur worker', err);
     }
   }
+
+
+
 
   private async sendNotification(alert, ruleId: string, status: 'active' | 'recovered' | 'flapping') {
 
@@ -193,18 +196,24 @@ export class WorkersService implements OnModuleInit {
           switch (alerter._source?.type) {
             case 'discord':
               // Discord: channelId and token can be encrypted
+
               channelId = alerter._source?.config.channelId;
               token = alerter._source?.config.token;
               if (this.ENCRYPTION_KEY !== undefined) {
                 channelId = await this.cryptService.decrypt(alerter._source?.config.channelId, this.ENCRYPTION_KEY);
                 token = await this.cryptService.decrypt(alerter._source?.config.token, this.ENCRYPTION_KEY);
               }
-              await this.discordService.sendDiscordMessage(
-                channelId,
-                token,
-                message,
-                alert
-              );
+              try {
+                await this.discordService.sendDiscordMessage(
+                  channelId,
+                  token,
+                  message,
+                  alert
+                );
+                this.utilsService.esLoggingHistory(`Discord message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              } catch (error) {
+                this.utilsService.esLoggingHistory(`Discord message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              }
               break; // Sortie du switch après envoi Discord
             case 'slack':
 
@@ -214,25 +223,34 @@ export class WorkersService implements OnModuleInit {
               if (this.ENCRYPTION_KEY !== undefined) {
                 token = await this.cryptService.decrypt(alerter._source?.config.token, this.ENCRYPTION_KEY);
               }
-              await this.slackService.sendSlackMessage(
-                alerter._source?.config.channelName,
-                token,
-                message,
-                alert
-              );
+              try {
+                await this.slackService.sendSlackMessage(
+                  alerter._source?.config.channelName,
+                  token,
+                  message,
+                  alert
+                );
+                this.utilsService.esLoggingHistory(`Slack message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              } catch (error) {
+                this.utilsService.esLoggingHistory(`Slack message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              }
               break;
 
 
             case 'teams':
               payload = alerter._source?.config.payload || '';
               isAdaptiveCard = alerter._source?.config.isAdaptiveCard || false;
-
+              try {
               await this.teamsService.sendTeamsMessage(
                 alerter._source?.config.webhook,
                 message,
                 isAdaptiveCard,
                 alert
               );
+              this.utilsService.esLoggingHistory(`Teams message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              } catch (error) {
+                this.utilsService.esLoggingHistory(`Teams message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              }
               break;
             case 'email':
               // Email: username and password can be encrypted
@@ -242,12 +260,12 @@ export class WorkersService implements OnModuleInit {
                 username = await this.cryptService.decrypt(alerter._source?.config.username, this.ENCRYPTION_KEY);
                 password = await this.cryptService.decrypt(alerter._source?.config.password, this.ENCRYPTION_KEY);
               }
-
-              await this.emailService.sendEmailMessage(
-                alerter._source?.config.smtp_server,
-                Number(alerter._source?.config.port),
-                username,
-                password,
+              try {
+                await this.emailService.sendEmailMessage(
+                  alerter._source?.config.smtp_server,
+                  Number(alerter._source?.config.port),
+                  username,
+                  password,
                 alerter._source?.config.from_address,
                 alerter._source?.config.to_addresses.split(",").map((addr: string) => addr.trim()),
                 alerter._source?.config.cc_addresses ? alerter._source?.config.cc_addresses.split(",").map((addr: string) => addr.trim()) : [],
@@ -255,20 +273,29 @@ export class WorkersService implements OnModuleInit {
                 message,
                 alert
               );
+              this.utilsService.esLoggingHistory(`Email message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              } catch (error) {
+                this.utilsService.esLoggingHistory(`Email message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              }
               break;
             case 'telegram':
-              
+
               if (this.ENCRYPTION_KEY !== undefined) {
                 token = await this.cryptService.decrypt(alerter._source?.config.token, this.ENCRYPTION_KEY);
                 chatId = await this.cryptService.decrypt(alerter._source?.config.chatId, this.ENCRYPTION_KEY);
               }
-              await this.telegramService.sendTelegramMessage(
-                token,
-                chatId,
-                message,
-                alert
-              );
-                break;
+              try {
+                await this.telegramService.sendTelegramMessage(
+                  token,
+                  chatId,
+                  message,
+                  alert
+                );
+                this.utilsService.esLoggingHistory(`Telegram message sent successfully`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              } catch (error) {
+                this.utilsService.esLoggingHistory(`Telegram message failed to send`, { alerter: { id: alerter._id , name: alerter._source?.name }, rule: { uuid: alert?._source?.['kibana.alert.rule.uuid'], name: alert?._source?.['kibana.alert.rule.name'] } });
+              }
+              break;
 
             default:
               this.logger.warn(`Alerter type ${alerter._source?.type} non géré`);

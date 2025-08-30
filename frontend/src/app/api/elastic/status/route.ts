@@ -1,7 +1,4 @@
-
-import { NextResponse } from 'next/server';
 import { esClient } from '@/lib/elasticsearch';
-import { format } from 'path';
 
 
 

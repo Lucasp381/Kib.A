@@ -2,26 +2,36 @@
 
 import { useState, useEffect } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { alertFieldMap } from "@/lib/alertFieldMap";
 import { Badge } from "@/components/ui/badge";
 import { ObservabilityAlert } from "@/types/alerts";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useElasticKV } from "@/hooks/useElasticKV";
-
+import { useResizableColumns } from "@/hooks/useResizableColumns";
 interface AlertsTableProps {
   pageSize?: number;
   refreshIntervalMs?: number; // intervalle refresh automatique
 }
 
+
 export default function AlertsTable({ pageSize = 15, refreshIntervalMs = 5000 }: AlertsTableProps) {
+  
   const { get } = useElasticKV();
   const [KIBANA_URL, setKIBANA_URL] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<ObservabilityAlert[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+ const alertFieldMap: Record<string, string> = {
+  "@timestamp": "Date",
+
+  "kibana.alert.status": "Status",
+  "kibana.alert.rule.name": "Rule",
+  "kibana.alert.reason": "Reason",
+
+  };
   const alertColumns: Array<keyof typeof alertFieldMap> = Object.keys(alertFieldMap) as Array<keyof typeof alertFieldMap>;
+  const { widths, startResize } = useResizableColumns(alertColumns);
 
   // Fetch alerts
   const fetchAlerts = async (currentPage: number, initialLoad = false) => {
@@ -51,15 +61,26 @@ export default function AlertsTable({ pageSize = 15, refreshIntervalMs = 5000 }:
     return () => clearInterval(interval);
   }, [page]); // refait le fetch si la page change
 
+
   return (
     <div className="w-full">
       <ScrollArea className="overflow-y-auto">
         <Table className="w-full table-auto">
           <TableHeader>
             <TableRow>
-              {alertColumns.map((col) => (
-                <TableHead key={col}>{alertFieldMap[col]}</TableHead>
-              ))}
+               {alertColumns.map((col) => (
+        <TableHead
+          key={col}
+          style={{ width: widths[col] }}
+          className="relative group select-none"
+        >
+          {alertFieldMap[col]}
+          <span
+            onMouseDown={(e) => startResize(col, e)}
+            className="absolute right-0 top-0 h-full w-1 cursor-col-resize bg-transparent group-hover:bg-gray-300"
+          />
+        </TableHead>
+      ))}
             </TableRow>
           </TableHeader>
           <TableBody>

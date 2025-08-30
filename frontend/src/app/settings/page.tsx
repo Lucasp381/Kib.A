@@ -246,7 +246,6 @@ function MainPage() {
   );
 }
 export default function SettingsPage() {
-  const cardTitleClass = "text-xl font-bold";
 
   return (
     <Card className={cardClass}>

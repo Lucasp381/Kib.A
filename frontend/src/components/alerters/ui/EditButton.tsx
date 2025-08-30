@@ -3,13 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Save, Trash2, Copy, TestTubeDiagonal } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { deleteDiscordAlerter, SetAndGetAlerters, saveDiscordAlerter } from "@/components/alerters/discord/DiscordService"; // Assurez-vous que ces fonctions existent
-import { deleteSlackAlerter, saveSlackAlerter } from "@/components/alerters/slack/SlackService"; // Assurez-vous que cette fonction existe
-import { deleteEmailAlerter, saveEmailAlerter } from "@/components/alerters/email/EmailService"; // Assurez-vous que cette fonction existe
 import { Alerter, DiscordAlerter, EmailAlerter, SlackAlerter, TeamsAlerter, TelegramAlerter } from "@/types/alerters"; // Assurez-vous que ce type est défini correctement
-import { deleteTeamsAlerter, saveTeamsAlerter } from "../teams/TeamsService";
-import { deleteTelegramAlerter, saveTelegramAlerter } from "../telegram/TelegramService";
 import axios from "axios";
+
 interface EditButtonProps<T extends Alerter> {
     editAlerter: Alerter | null;
     alerters: Alerter[];
@@ -19,7 +15,21 @@ interface EditButtonProps<T extends Alerter> {
     type: T["type"];
 }
 
+
 export default function EditButton<T extends Alerter>({ editAlerter, loading, alerters, setAlerters, setEditAlerter, type }: EditButtonProps<T>) {
+     async function SetAndGetAlerters(type: string, setAlerters: React.Dispatch<React.SetStateAction<Alerter[]>>) {
+
+
+    fetch(`/api/backend/alerters?type=${type}`)
+        .then((res) => res.json())
+        .then((data) => {
+            setAlerters(data as Alerter[]);
+           
+        })
+        .catch((err) => {
+            console.error("Erreur lors de la récupération des Discord alerters :", err);
+        });
+    }
     return (
         <Card className="sticky inline top-0 z-10 shadow-none border-none rounded-none  bg-card" >
 
@@ -180,24 +190,34 @@ export default function EditButton<T extends Alerter>({ editAlerter, loading, al
                 <Button
                     className="w-[50px] btn-color destructive"
                     title="Delete"
-                    onClick={() => {
-                        switch (type) {
-                            case "discord":
-                                deleteDiscordAlerter(editAlerter?.id || "", alerters as DiscordAlerter[], setAlerters as React.Dispatch<React.SetStateAction<DiscordAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<DiscordAlerter | null>>);
-                                break;
-                            case "slack":
-                                deleteSlackAlerter(editAlerter?.id || "", alerters as SlackAlerter[], setAlerters as React.Dispatch<React.SetStateAction<SlackAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<SlackAlerter | null>>);
-                                break;
-                            case "email":
-                                deleteEmailAlerter(editAlerter?.id || "", alerters as EmailAlerter[], setAlerters as React.Dispatch<React.SetStateAction<EmailAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<EmailAlerter | null>>);
-                                break;
-                            case "teams":
-                                deleteTeamsAlerter(editAlerter?.id || "", alerters as TeamsAlerter[], setAlerters as React.Dispatch<React.SetStateAction<TeamsAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<TeamsAlerter | null>>);
-                                break;
-                            case "telegram":
-                                deleteTelegramAlerter(editAlerter?.id || "", alerters as TelegramAlerter[], setAlerters as React.Dispatch<React.SetStateAction<TelegramAlerter[]>>, setEditAlerter as React.Dispatch<React.SetStateAction<TelegramAlerter | null>>);
-                        }
+                    onClick={async () => {
+                        const id = editAlerter?.id || "";
 
+                                if (!id) {
+                                    return;
+                                }
+                                if (!window.confirm(`Are you sure you want to delete this ${type.charAt(0).toUpperCase() + type.slice(1)} alerter?`)) {
+                                    return;
+                                }
+                                await fetch(`/api/backend/alerters?id=${id}`, {
+                                    method: "DELETE",
+                                })
+                                    .then((res) => {
+                                        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                                        toast.success("Alerter deleted successfully!");
+
+                                        setAlerters((prevAlerters) => prevAlerters.filter((alerter) => alerter.id !== id));
+                                        if (setEditAlerter) {
+                                            setEditAlerter(alerters.length > 0 ? alerters[0] : null);
+                                        }
+
+                                        return res.json();
+                                    })
+
+                                    .catch((err) => {
+                                        console.error("Erreur lors de la suppression de l'alerter :", err);
+                                    });
+                              
                     }}
                     type="button"
                 >

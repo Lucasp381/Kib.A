@@ -51,8 +51,7 @@ export default function AlertersMenu<T extends Alerter>({ alerters, editAlerter,
                                         const slackConfig = alerter.config as SlackAlerter["config"];
                                         return <small className="text-xs text-main-900 dark:text-white overflow-hidden">{slackConfig.channelName || slackConfig.channelId}</small>;
                                     case "teams":
-                                        const teamsConfig = alerter.config as TeamsAlerter["config"];
-                                        { alerter ? <small className="text-xs text-main-900 dark:text-white overflow-hidden">ddd</small> : null }
+                                        { alerter ? <small className="text-xs text-main-900 dark:text-white overflow-hidden"></small> : null }
                                     default:
                                         return null;
                                 }

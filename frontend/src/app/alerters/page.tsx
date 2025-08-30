@@ -7,14 +7,12 @@ import { faHelmetSafety } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faSlack, faMicrosoft, faTelegram,  } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import DiscordAlerterTab from "@/components/alerters/discord/DiscordAlerterTab";
 import SlackAlerterTab from '@/components/alerters/slack/SlackAlerterTab';
 import EmailAlerterTab from '@/components/alerters/email/EmailAlerterTab';
 import TeamsAlerterTab from '@/components/alerters/teams/TeamsAlerterTab';
 
-import { Alerter } from "@/types/alerters";
 import TelegramAlerterTab from '@/components/alerters/telegram/TelegramAlerterTab';
 const cardClass = "p-6 border-none border-gray-300 shadow-none rounded-none bg-herit";
 

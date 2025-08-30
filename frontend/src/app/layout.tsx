@@ -2,18 +2,19 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { Switch } from "@/components/ui/switch";
-import { Home, Settings, Send, Dot } from "lucide-react";
+import { Home, Settings, Send} from "lucide-react";
 import { useEffect, useState } from "react";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { MenuButton } from "@/components/menu/menuButton";
 import { ThemeProvider } from "next-themes";
 import { usePathname } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton"; // ajoute ça en haut
 import  Custom503  from "@/components/errorsPages/503"
-import { set } from "zod";import WorkerControl from "@/components/worker/WorkerControl";
+
+import WorkerControl from "@/components/worker/WorkerControl";
+import Link from "next/link";
 
 const geistSans = localFont({
   src: [
@@ -126,41 +127,43 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <div className="grid grid-rows-[auto,1fr]  ">
             {/* Header en haut, sur toute la largeur */}
-            <header className="sticky top-0 z-50 col-span-2 flex items-center justify-between bg-card border-b border-gray-200 dark:border-gray-700 p-4 shadow-md">
+            <header className="sticky top-0 z-50 col-span-2 flex items-center justify-between bg-card border-b border-main-200 dark:border-main-700 p-4 shadow-md">
               {showLabel && (
-                
-                <>
-                  <a className="inline items-center gap-2" href="/">
-                    <h1 className="font-extrabold text-4xl text-main-600 ml-20">
+
+                <Card className="grid grid-cols-3 w-full items-center border-main-200 dark:border-main-700 shadow-none border-none py-0">
+                  <Link className="inline items-center gap-2" href="/">
+                    <h1 className="font-extrabold text-4xl text-main-600 pl-10 ">
                       Kib.<span className="text-red-600">A</span>
                     </h1>
-                    <small className="flex ml-20 text-sm text-muted-foreground">
-                      Kibana Alert Management
+                    <small className="flex text-sm text-muted-foreground  pl-10">
+                      Kibana Alerters Management
                     </small>
-                  </a>
-                  <WorkerControl />
-                    <div className=" gap-2">
-                      <div className="grid grid-cols-2 w-20 items-center">
-                        <small className="w-20 text-sm text-main-600 font-bold first-letter:text-red-600">Elastic</small>
-                        {esStatus ? (
+                  </Link>
+                  <div className="flex items-center justify-center gap-2">
+                    <WorkerControl />
+                  </div>
+                  <div className="gap-2 justify-items-end">
+                    <div className="grid grid-cols-2 items-center">
+                      <small className="text-sm text-main-600 font-bold first-letter:text-red-600">Elastic</small>
+                      {esStatus ? (
                           <span className=" flex items-center justify-center">
                             {esStatus?.status === "green" ? (
-                              <div className=" bg-green-500 size-3 rounded-full border-1 m-0 p-0" />
+                              <span className=" bg-green-500 size-3 rounded-full border-1 m-0 p-0" />
                             ) : esStatus?.status === "yellow" ? (
-                              <div className=" bg-yellow-500 size-3 rounded-full border-1 m-0 p-0" />
+                              <span className=" bg-yellow-500 size-3 rounded-full border-1 m-0 p-0" />
                             ) : (
-                              <div className=" bg-red-500 size-3 rounded-full border-1 m-0 p-0" />
+                              <span className=" bg-red-500 size-3 rounded-full border-1 m-0 p-0" />
                             )}
                           </span>
                         ) : (
                           <span className=" flex items-center justify-center">
-                            <div className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
+                            <span className=" bg-main-500 size-3 rounded-full border-1 m-0 p-0" />
                           </span>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 w-20 items-center ">
-                        <CardTitle className="text-sm font-bold text-main-600 first-letter:text-red-600">Kibana</CardTitle>
+                      <div className="grid grid-cols-2 items-center ">
+                        <div className="text-sm font-bold text-main-600 first-letter:text-red-600">Kibana</div>
                         {kibanaStatus ? (
                           <span className="flex items-center justify-center">
                             {kibanaStatus?.status?.overall?.level === "available" ? (
@@ -178,7 +181,7 @@ export default function RootLayout({
                         )}
                       </div>
                     </div>
-                </>
+                </Card>
               )}
             </header>
 

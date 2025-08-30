@@ -21,7 +21,7 @@ export function MenuButton({ href, icon, children, active, className }: MenuButt
       href={href}
       className={cn(
         "w-[150px]",
-        "flex items-center gap-2 mx-10 px-5 py-1 rounded-sm transition font-medium",
+        "flex items-center gap-2 mx-10 px-5 py-1 rounded-sm transition font-medium select-none",
         active ? "dark:bg-[#23232a] bg-main-100 text-main-900 dark:text-main-50" : " text-main-900 dark:text-main-50",
         className
       )}

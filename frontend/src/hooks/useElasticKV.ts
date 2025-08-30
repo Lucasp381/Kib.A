@@ -1,6 +1,5 @@
 // hooks/useElasticKV.ts
 import { useCallback } from "react"
-import { estypes } from "@elastic/elasticsearch"
 
 type ElasticKVResponse<T> =
 

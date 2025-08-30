@@ -1,5 +1,4 @@
 'use client';
-import { useEffect, useState } from "react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Bell, Cctv } from "lucide-react";
@@ -11,24 +10,7 @@ import AlertsTable from "@/components/AlertsTable/AlertsTable";
 
 
 export default function DashboardPage() {
-    const [alerts, setAlerts] = useState([]);
-    const [rules, setRules] = useState<{ id: string; name: string }[]>([]);
-    useEffect(() => {
-        fetch("/api/backend/elastic/index/documents?index=*alerts-*")
-            .then((res) => res.json())
-            .then((result) => {
-                setAlerts(result.data);
-            });
 
-    }, []);
-
-    useEffect(() => {
-        fetch("/api/kibana/rules")
-            .then((res) => res.json())
-            .then((data) => {
-                setRules(data.data);
-            });
-    }, []);
 
     const cardClass = "p-6 border-none  border-blue-300 shadow-none rounded-none bg-herit pb-0 max-h-[80vh]";
     const cardTitleClass = "text-xl font-bold mb-0";

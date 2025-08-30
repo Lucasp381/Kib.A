@@ -1,4 +1,4 @@
-import { Client, estypes } from '@elastic/elasticsearch';
+import { Client } from '@elastic/elasticsearch';
 
 const esClientConfiguration: {
   node: string;
