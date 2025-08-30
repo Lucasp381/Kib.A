@@ -160,7 +160,12 @@ http://localhost:8080
 
 ## Tips
 - You can add `KIBANA_URL` variable in settings > Variables to be able to double click on alerts and rules in the Dashboard
-
+- You can pause programatically the notifications :
+```curl
+curl 'http://127.0.0.1:3000/api/backend/worker/pause' \
+  -H 'Content-Type: application/json' \
+  --data-raw '{"minutes":5}'
+```
 ## 🛠 Tech Stack
 
 - [NestJS](https://nestjs.com/) – Backend  
