@@ -27,6 +27,7 @@ This is a early stage of the project, so there are still bugs and issues.
 - 😱 **Emoji & placeholders** 
 - 🖍️ **Rule selection**
 - ⏱️ **Start/Pause/Stop notifications globally**
+- 🎶 **Notifications history**
 
 <p align="center" >
   <img src="https://github.com/user-attachments/assets/678a0251-0bae-4513-bb2b-86bd5e774756" width="800" />
@@ -108,6 +109,8 @@ Kib.A creates 4 index:
 #### 📂 .env
 ```env
 KIBANA_URL="http://host.docker.internal:5601" # URL for Kibana instance
+PUBLIC_KIBANA_URL="http://127.0.0.1:5601" # Url used client side
+
 ELASTIC_URL="http://host.docker.internal:9200" # Elasticsearch node URL
 ELASTIC_API_KEY='API-KEY-HERE' # Replace with your actual API key
 KIBA_INDEX_PREFIX="kiba" # Prefix for Kib.A indices allow multiple instances
@@ -186,11 +189,12 @@ curl 'http://127.0.0.1:3000/api/backend/worker/pause' \
 
 ---
 
+
 ## Screenshots
 |                                                        |                                                       |
 | ----------------------------------------------------------- | ---------------------------------------------------------- |
-| ![](./github/dashboard.png)                                 | ![](./github/dashboard-d.png)|
-| ![](./github/alerters-discord.png)                          | ![](./github/alerters-teams.png  )|
+| ![](https://github.com/user-attachments/assets/1f6c90f1-0e3a-4f80-bd8a-4224d949af59)                                 | ![](https://github.com/user-attachments/assets/35ed2018-c5e8-452a-9a83-39457d524764)|
+| ![](./github/alerters-discord.png)                          | ![](https://github.com/user-attachments/assets/691f4780-172b-4c6c-9127-ccb18402f9fd)|
 | ![](./github/teams-alert.png)                            | ![](./github/discord-alert.png)|
 
 
