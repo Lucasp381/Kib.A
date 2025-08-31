@@ -1,8 +1,10 @@
 // ...existing code...
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 
 export async function middleware(req: NextRequest) {
-    
+
 }
-// ...existing code...
+
+
+    // ...existing code...

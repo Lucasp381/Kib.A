@@ -124,7 +124,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body className="bg-card text-foreground antialiased  overflow-hidden">
+      <body className="bg-card text-foreground antialiased  overflow-hidden ">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <div className="grid grid-rows-[auto,1fr]  ">
             {/* Header en haut, sur toute la largeur */}
@@ -216,7 +216,7 @@ export default function RootLayout({
                   </div>
                 </Card>
 
-                <main className="h-[calc(100vh-93px)] overflow-y-auto">
+                <main className="h-[calc(100vh-93px)] overflow-y-auto pb-5">
                   {children}
                   <Toaster richColors position="top-center" />
                 </main>

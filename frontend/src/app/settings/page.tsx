@@ -61,7 +61,7 @@ function VariablesTable() {
       return;
     }
     const r = await set(id, newValue);
-    r.ok ? toast.success("Variable mise à jour avec succès") : toast.error(`Erreur: ${r.error}`);
+    r.ok ? toast.success("Variable mise à jour avec succès") : toast.error(`Erreur: ${r}`);
     if (r.ok) {
       await fetchVariables();
       setEditValues(prev => {
@@ -73,7 +73,6 @@ function VariablesTable() {
     setLoading(false);
   };
 
-  // Ajouter une nouvelle variable
   const handleAdd = async () => {
     if (!canAct || !key) {
       toast.error("La clé est requise");
@@ -81,7 +80,7 @@ function VariablesTable() {
     }
     setLoading(true);
     const r = await set(key, value);
-    r.ok ? toast.success("Variable ajoutée avec succès") : toast.error(`Erreur: ${r.error}`);
+    r.ok ? toast.success("Variable ajoutée avec succès") : toast.error(`Erreur: ${r}`);
     if (r.ok) {
       setKey("");
       setValue("");
@@ -90,13 +89,12 @@ function VariablesTable() {
     setLoading(false);
   };
 
-  // Supprimer une variable par son id
   const handleDelete = async (id: string) => {
     if (!canAct) return;
     if (!confirm(`Êtes-vous sûr de vouloir supprimer la variable [${id}] ?`)) return;
     setLoading(true);
     const r = await del(id);
-    r.ok ? toast.success("Variable supprimée avec succès") : toast.error(`Erreur: ${r.error}`);
+    r.ok ? toast.success("Variable supprimée avec succès") : toast.error(`Erreur: ${r}`);
     if (r.ok) {
       await fetchVariables();
     }

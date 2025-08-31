@@ -3,8 +3,8 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Bell, Cctv } from "lucide-react";
 import TitleCard from "@/components/menu/titleCard";
-import RulesTable from "@/components/RulesTable/RulesTable";
-import AlertsTable from "@/components/AlertsTable/AlertsTable";
+import RulesTable from "@/components/RulesTable/page";
+import AlertsTable from "@/components/AlertsTable/page";
 
 
 
@@ -17,32 +17,17 @@ export default function DashboardPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-8  w-full">
 
-            <Card className={cardClass}>
-                <CardTitle className={cardTitleClass}><TitleCard Icon={<Bell />} Title="Alerts" /></CardTitle>
-                <CardDescription className="text-main-500">
-                    Here you can view the latest alerts from your Kibana instance.
-                </CardDescription>
+
                 
 
-                <AlertsTable pageSize={10}/>
+                <AlertsTable />
                
                
-            </Card>
+            
             <Separator />
-            <Card className={cardClass}>
-               
-                    <>
-                        <CardTitle className={cardTitleClass}><TitleCard Icon={<Cctv />} Title="Rules" /></CardTitle>
-                        <CardDescription className="text-main-500">
-                            Here you can view the latest rules from your Kibana instance.
-                        </CardDescription>
-                   
+            
                     <RulesTable  />
                    
-                
-                    </>
-
-            </Card>
 
         </div>
     );

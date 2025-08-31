@@ -13,8 +13,13 @@ export class IndexController {
   }
 
   @Get('history')
-  async findAllHistory(@Query('limit') limit: number, @Query('page') page: number) {
+  async findAllHistory(@Query('limit') limit: number = 1000, @Query('page') page: number) {
     const index = process.env.KIBA_INDEX_PREFIX + '-history' || 'kiba-history';
+    return this.indexService.findAllDocuments(index, limit, page);
+  }
+  @Get('alerts')
+  async findAllAlerts(@Query('limit') limit: number = 1000, @Query('page') page: number) {
+    const index = '*alerts-*' ;
     return this.indexService.findAllDocuments(index, limit, page);
   }
 
